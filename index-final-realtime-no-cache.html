@@ -1,0 +1,3642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sunday School Attendance System</title>
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#08111f;--bg2:#101b31;--glass:rgba(255,255,255,.08);--glass2:rgba(255,255,255,.12);
+  --stroke:rgba(255,255,255,.14);--text:#f7fbff;--muted:#aab7ca;--blue:#5da7ff;--violet:#7a79ff;
+  --green:#70dc9b;--red:#ff7d8a;--yellow:#facc15;--card:#ffffff;--ink:#111827;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:var(--text);
+  font-family:"DM Sans","Kantumruy Pro",system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(93,167,255,.22),transparent 30%),
+    radial-gradient(circle at 90% 100%,rgba(122,121,255,.18),transparent 35%),
+    linear-gradient(145deg,var(--bg1),var(--bg2));
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.glass{background:var(--glass);border:1px solid var(--stroke);box-shadow:0 18px 50px rgba(0,0,0,.28);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.btn{border:1px solid var(--stroke);border-radius:14px;padding:10px 14px;background:rgba(255,255,255,.08);color:#fff}
+.btn:hover{background:rgba(255,255,255,.15)}
+.btn.primary{border:0;background:linear-gradient(135deg,var(--blue),var(--violet));font-weight:800}
+.btn.danger{background:rgba(255,125,138,.16);color:#ffd7dc}
+.btn.small{padding:7px 10px;border-radius:10px;font-size:13px}
+.input{width:100%;border:1px solid var(--stroke);border-radius:15px;background:rgba(255,255,255,.08);color:#fff;padding:12px 13px;outline:none}
+.input::placeholder{color:#94a3b8}
+.login-wrap{min-height:100vh;display:grid;place-items:center;padding:22px}
+.login-card{width:min(430px,100%);border-radius:28px;padding:24px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.brand-icon{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(93,167,255,.36),rgba(255,255,255,.08));font-size:25px}
+.brand h1{font-size:22px;line-height:1.25;margin:0}
+label{display:block;font-size:13px;color:#dbeafe;font-weight:800;margin:0 0 7px}
+.field{margin-bottom:13px}
+.status{min-height:22px;font-size:13px;color:var(--muted);margin-top:10px}
+
+.app{display:block;min-height:100vh;padding:12px;max-width:1500px;margin:0 auto}
+.sidebar{position:sticky;top:16px;height:calc(100vh - 32px);border-radius:26px;padding:14px;display:flex;flex-direction:column}
+.side-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.side-title{display:flex;align-items:center;gap:10px;font-weight:900;line-height:1.2}
+.menu-toggle{width:40px;height:40px;border-radius:14px;display:grid;place-items:center}
+/* ===== RED GLASS CHURCH SWITCH START ===== */
+.church-switch-wrap{position:relative;margin:0 0 12px}
+.church-switch-btn{
+  width:100%;border:1px solid rgba(248,113,113,.48);
+  background:linear-gradient(135deg,rgba(248,113,113,.30),rgba(127,29,29,.18));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 12px 28px rgba(127,29,29,.22);
+  color:#fecaca;border-radius:17px;padding:11px 12px;
+  display:flex;align-items:center;justify-content:space-between;gap:9px;
+  font-weight:900;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.church-switch-btn span{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-align:left
+}
+.church-switch-btn:hover,.church-switch-wrap.open .church-switch-btn{
+  background:linear-gradient(135deg,rgba(248,113,113,.42),rgba(127,29,29,.25));
+  color:#fff;border-color:rgba(252,165,165,.7)
+}
+.church-switch-dropdown{
+  display:none;position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:90;
+  padding:7px;border-radius:16px;border:1px solid rgba(248,113,113,.35);
+  background:linear-gradient(180deg,rgba(31,41,55,.94),rgba(15,23,42,.90));
+  box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.14);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  max-height:260px;overflow:auto
+}
+.church-switch-wrap.open .church-switch-dropdown{display:flex;flex-direction:column;gap:6px}
+.church-option{
+  width:100%;border:1px solid rgba(248,113,113,.18);border-radius:12px;
+  background:rgba(255,255,255,.075);color:#fee2e2;padding:9px 10px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  text-align:left;font-weight:800
+}
+.church-option:hover,.church-option.active{
+  background:linear-gradient(135deg,rgba(248,113,113,.27),rgba(127,29,29,.18));
+  border-color:rgba(248,113,113,.5);color:#fff
+}
+.church-option small{color:#fca5a5;font-weight:800}
+.church-create-mini{
+  margin-top:4px;border:1px dashed rgba(252,165,165,.5)!important;
+  background:rgba(127,29,29,.18)!important;color:#fecaca!important
+}
+/* Red glass title inside page */
+.red-glass-title{
+  display:inline-flex;align-items:center;width:max-content;max-width:100%;
+  padding:6px 12px;border-radius:14px;border:1px solid rgba(248,113,113,.44);
+  background:linear-gradient(135deg,rgba(248,113,113,.26),rgba(127,29,29,.16));
+  color:#fecaca;font-weight:900;box-shadow:inset 0 1px 0 rgba(255,255,255,.16)
+}
+/* ===== RED GLASS CHURCH SWITCH END ===== */
+
+.nav-list{display:flex;flex-direction:column;gap:8px}
+.nav-btn{width:100%;display:flex;align-items:center;gap:10px;border:0;border-radius:16px;padding:12px;background:transparent;color:#dbe7f8;text-align:left;font-weight:800}
+.nav-btn i{font-size:19px}
+.nav-btn.active,.nav-btn:hover{background:linear-gradient(135deg,rgba(93,167,255,.28),rgba(122,121,255,.14));color:#fff}
+.side-bottom{margin-top:auto;color:var(--muted);font-size:13px}
+
+/* ===== iOS GLASS TOP NAV START ===== */
+.ios-nav{
+  position:sticky;top:10px;z-index:80;
+  display:flex;align-items:center;gap:9px;
+  border-radius:24px;padding:9px;
+  margin-bottom:12px;
+  background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,.06));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 18px 46px rgba(0,0,0,.24);
+}
+.ios-brand{
+  flex:0 0 auto;display:flex;align-items:center;gap:7px;
+  padding:0 8px;color:#f8fbff;font-weight:900;white-space:nowrap;
+}
+.ios-brand i{
+  width:34px;height:34px;border-radius:13px;display:grid;place-items:center;
+  background:linear-gradient(135deg,rgba(93,167,255,.36),rgba(122,121,255,.18));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+}
+.ios-nav-scroll{
+  flex:1;min-width:0;display:flex;align-items:center;gap:6px;
+  overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+}
+.ios-nav-scroll::-webkit-scrollbar{display:none}
+.ios-nav .nav-btn{
+  flex:0 0 auto;width:auto;min-width:58px;height:42px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  border:1px solid rgba(255,255,255,.14);border-radius:15px;
+  padding:5px 8px;background:rgba(255,255,255,.075);
+  color:#dbe7f8;text-align:center;font-weight:900;font-size:10px;line-height:1;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.ios-nav .nav-btn i{font-size:17px;line-height:1}
+.ios-nav .nav-btn.active,.ios-nav .nav-btn:hover{
+  background:linear-gradient(135deg,rgba(93,167,255,.58),rgba(122,121,255,.38));
+  color:#fff;border-color:rgba(191,219,254,.45);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 8px 20px rgba(59,130,246,.18);
+}
+.top-church-switch{
+  flex:0 0 210px;margin:0!important;
+}
+.top-church-switch .church-switch-btn{
+  height:42px;border-radius:15px;padding:7px 10px;font-size:12px;
+}
+.top-church-switch .church-switch-dropdown{
+  min-width:230px;right:auto;
+}
+.topbar{
+  position:relative!important;top:auto!important;
+}
+.main{min-width:0}
+.sidebar,.side-head,.nav-list,.side-bottom,.mobile-open{display:none!important}
+/* ===== iOS GLASS TOP NAV END ===== */
+
+.topbar{border-radius:22px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;background:rgba(255,255,255,.06)!important}
+.topbar h2{margin:0;font-size:20px}
+.user-pill{display:flex;align-items:center;gap:8px;color:#dbeafe;font-size:13px}
+.page{display:none}
+.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.stat{border-radius:23px;padding:18px}
+.stat small{color:var(--muted);font-weight:700}
+.stat b{display:block;font-size:34px;margin-top:5px}
+.panel{border-radius:26px;padding:16px;margin-bottom:16px}
+.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.panel-head h3{margin:0;font-size:18px}
+.table-wrap{overflow:auto;border-radius:18px;border:1px solid rgba(255,255,255,.1)}
+table{width:100%;border-collapse:collapse;min-width:760px}
+th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.09);text-align:left}
+th{color:#cfe0f5;font-size:13px}
+td{color:#f8fbff}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.form-grid .full{grid-column:1/-1}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.student-card{border-radius:20px;padding:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11)}
+.student-card h4{margin:0 0 4px}
+.muted{color:var(--muted);font-size:13px}
+.att-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.055);border-radius:18px;padding:10px 12px;margin-bottom:9px}
+.att-actions{display:flex;gap:7px}
+.status-btn{width:38px;height:38px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:#fff}
+.status-btn.present.active{background:rgba(112,220,155,.25);border-color:rgba(112,220,155,.55)}
+.status-btn.absent.active{background:rgba(255,125,138,.25);border-color:rgba(255,125,138,.55)}
+.status-btn.late.active{background:rgba(250,204,21,.25);border-color:rgba(250,204,21,.55)}
+.stars{letter-spacing:1px;color:var(--yellow);white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:900;background:rgba(93,167,255,.16);color:#bfdbfe;border:1px solid rgba(93,167,255,.28)}
+.top-church-badge{
+  appearance:none;-webkit-appearance:none;
+  display:inline-flex;align-items:center;max-width:190px;padding:6px 10px;border-radius:999px;
+  border:1px solid rgba(248,113,113,.48);
+  background:linear-gradient(135deg,rgba(248,113,113,.28),rgba(127,29,29,.15));
+  color:#fecaca;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+  cursor:pointer;
+}
+.top-church-badge:hover{
+  background:linear-gradient(135deg,rgba(248,113,113,.40),rgba(127,29,29,.22));
+  color:#fff;
+}
+.empty{border:1px dashed rgba(255,255,255,.18);border-radius:20px;padding:28px;text-align:center;color:var(--muted)}
+
+
+.week-swap{
+  position:relative;
+  overflow:hidden;
+  display:flex;align-items:center;gap:7px;
+  border-radius:18px;padding:7px;margin-bottom:12px;
+  background:rgba(255,255,255,.055);
+  touch-action:pan-y;
+  user-select:none;
+}
+.week-swipe-wipe{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:0;
+  transform:translateX(-105%);
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(93,167,255,.18) 18%,
+      rgba(122,121,255,.42) 48%,
+      rgba(112,220,155,.24) 74%,
+      transparent 100%);
+  filter:blur(.2px);
+}
+.week-swap > *:not(.week-swipe-wipe){
+  position:relative;
+  z-index:1;
+}
+.week-swap.swiping-left .week-swipe-wipe{
+  animation:weekWipeLeft .42s cubic-bezier(.2,.8,.2,1);
+}
+.week-swap.swiping-right .week-swipe-wipe{
+  animation:weekWipeRight .42s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes weekWipeLeft{
+  0%{opacity:0;transform:translateX(-105%)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translateX(105%)}
+}
+@keyframes weekWipeRight{
+  0%{opacity:0;transform:translateX(105%)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translateX(-105%)}
+}
+.week-swap.week-pop{
+  animation:weekPop .34s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes weekPop{
+  0%{box-shadow:0 0 0 rgba(93,167,255,0),inset 0 1px 0 rgba(255,255,255,.12)}
+  45%{box-shadow:0 0 0 4px rgba(93,167,255,.16),0 0 30px rgba(122,121,255,.20),inset 0 1px 0 rgba(255,255,255,.22)}
+  100%{box-shadow:0 0 0 rgba(93,167,255,0),inset 0 1px 0 rgba(255,255,255,.12)}
+}
+.week-center{
+  display:flex;align-items:center;gap:7px;flex:1;min-width:0;
+}
+
+.week-input,.week-select{
+  min-width:0;height:38px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.075);color:#fff;border-radius:14px;
+  padding:0 10px;outline:none;font-weight:800;
+}
+.week-input{width:126px;flex:0 0 126px}
+.week-select{flex:1;font-size:13px}
+.week-input option,.week-select option{background:#1f2937;color:#fff}
+.week-arrow{
+  width:38px;height:38px;flex:0 0 38px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.08);
+  color:#eaf3ff;display:grid;place-items:center;font-size:20px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10)
+}
+.week-arrow:hover{background:rgba(255,255,255,.15)}
+.current-sunday-pill{
+  flex:0 0 auto;min-width:92px;text-align:center;
+  height:38px;display:flex;align-items:center;justify-content:center;
+  border-radius:999px;border:1px solid rgba(93,167,255,.30);
+  background:linear-gradient(135deg,rgba(93,167,255,.20),rgba(122,121,255,.12));
+  color:#dbeafe;font-size:12px;font-weight:900;white-space:nowrap;
+}
+
+.home-paper{
+  background:linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.045));
+  color:#f8fbff;border:1px solid rgba(255,255,255,.13);
+  border-radius:24px;padding:16px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 16px 38px rgba(0,0,0,.18);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+.home-paper-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}
+.home-title{font-size:22px;font-weight:900;color:#fff}
+.home-date{font-size:14px;color:#b9c7dc;margin-top:3px}
+.home-total{
+  min-width:130px;text-align:center;border:1px solid rgba(93,167,255,.26);
+  border-radius:18px;padding:10px 12px;
+  background:linear-gradient(135deg,rgba(93,167,255,.18),rgba(122,121,255,.10));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12)
+}
+.home-total span{display:block;font-size:12px;color:#cfe0f5;font-weight:800}
+.home-total b{display:block;font-size:34px;line-height:1;color:#fff}
+.home-table-wrap{border:0;background:transparent;border-radius:18px}
+.home-table{min-width:0;border-collapse:separate;border-spacing:0 9px}
+.home-table thead{display:none}
+.home-table tr{
+  border-radius:18px;
+}
+.home-table td{
+  color:#f8fbff;border:0!important;font-size:16px;
+  background:rgba(255,255,255,.065);
+  border-top:1px solid rgba(255,255,255,.10)!important;
+  border-bottom:1px solid rgba(255,255,255,.10)!important;
+  padding:13px 12px
+}
+.home-table td:first-child{
+  width:58px;border-left:1px solid rgba(255,255,255,.10)!important;
+  border-radius:18px 0 0 18px;color:#bfdbfe;font-weight:900;text-align:center
+}
+.home-table td:nth-child(2){font-weight:900}
+.home-table td:last-child{
+  width:82px;border-right:1px solid rgba(255,255,255,.10)!important;
+  border-radius:0 18px 18px 0;text-align:center
+}
+.home-check{font-size:22px;color:#70dc9b;font-weight:900}
+.home-empty-check{font-size:22px;color:#64748b}
+.home-check-box{
+  width:25px;height:25px;accent-color:#70dc9b;cursor:pointer;
+  transform:translateY(3px);filter:drop-shadow(0 4px 10px rgba(112,220,155,.18))
+}
+.home-row-checked td{
+  background:linear-gradient(135deg,rgba(112,220,155,.20),rgba(255,255,255,.065))!important;
+  border-color:rgba(112,220,155,.30)!important;
+  font-weight:900;
+}
+.home-row-unchecked td{
+  background:rgba(255,255,255,.052)!important;
+  color:#cbd5e1;
+}
+.home-row-unchecked td:nth-child(2){color:#cbd5e1;font-weight:800}
+.home-summary{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:14px}
+.home-summary span{
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.065);border-radius:999px;
+  padding:7px 11px;font-size:13px;color:#dbeafe;font-weight:800
+}
+
+
+/* ===== MODERN SCROLLBARS START ===== */
+*{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(147,197,253,.55) rgba(255,255,255,.06);
+}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.06);border-radius:999px}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,rgba(147,197,253,.80),rgba(93,167,255,.45));
+  border-radius:999px;border:2px solid rgba(15,23,42,.75)
+}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,rgba(191,219,254,.95),rgba(96,165,250,.70))}
+/* ===== MODERN SCROLLBARS END ===== */
+
+/* ===== COMPACT HOME ATTENDANCE LIST START ===== */
+#page-home .panel{padding:12px}
+#page-home .panel-head{margin-bottom:10px}
+#page-home .panel-head h3{font-size:20px}
+#page-home .home-paper{padding:11px;border-radius:20px}
+#page-home .home-paper-head{margin-bottom:9px}
+#page-home .home-title{font-size:20px}
+#page-home .home-date{font-size:12px}
+#page-home .home-total{
+  min-width:112px;padding:7px 10px;border-radius:15px;
+}
+#page-home .home-total b{font-size:26px}
+#page-home .home-total span{font-size:11px}
+#page-home .home-table-wrap{
+  max-height:62vh;
+  overflow:auto;
+  padding-right:2px;
+}
+#page-home .home-table{
+  border-spacing:0 6px;
+}
+#page-home .home-table td{
+  padding:8px 9px!important;
+  font-size:14px!important;
+}
+#page-home .home-table td:first-child{
+  width:44px!important;
+  font-size:14px!important;
+}
+#page-home .home-table td:last-child{
+  width:62px!important;
+}
+.home-check-box{
+  appearance:none;
+  -webkit-appearance:none;
+  width:28px!important;
+  height:28px!important;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.24);
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.08));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 8px 18px rgba(0,0,0,.16);
+  display:inline-grid;
+  place-items:center;
+  cursor:pointer;
+  position:relative;
+  vertical-align:middle;
+  transform:none!important;
+}
+.home-check-box:checked{
+  border-color:rgba(112,220,155,.70);
+  background:linear-gradient(135deg,rgba(112,220,155,.95),rgba(34,197,94,.70));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),0 8px 22px rgba(34,197,94,.22);
+}
+.home-check-box:checked::after{
+  content:"✓";
+  color:#fff;
+  font-size:21px;
+  font-weight:900;
+  line-height:1;
+  position:absolute;
+  top:1px;
+  left:6px;
+}
+.home-row-checked td{
+  background:linear-gradient(135deg,rgba(112,220,155,.18),rgba(255,255,255,.055))!important;
+}
+.home-row-unchecked td{
+  background:rgba(255,255,255,.045)!important;
+}
+#page-home .home-summary{
+  margin-top:9px;
+}
+#page-home .home-summary span{
+  padding:5px 9px;
+  font-size:12px;
+}
+/* ===== COMPACT HOME ATTENDANCE LIST END ===== */
+
+
+/* ===== COMPACT DASHBOARD START ===== */
+#page-dashboard .grid{
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-bottom:10px;
+}
+#page-dashboard .stat{
+  border-radius:18px;
+  padding:11px 12px;
+  min-height:86px;
+}
+#page-dashboard .stat small{
+  font-size:12px;
+  line-height:1.2;
+}
+#page-dashboard .stat b{
+  font-size:30px;
+  margin-top:4px;
+  line-height:1;
+}
+.copy-box{
+  width:100%;
+  min-height:0;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:18px;
+  background:rgba(255,255,255,.075);
+  color:#f8fbff;
+  padding:14px;
+  outline:none;
+  resize:none;
+  overflow:hidden;
+  line-height:1.8;
+  white-space:pre-wrap;
+  font-family:"Kantumruy Pro","DM Sans",sans-serif;
+  font-size:15px;
+}
+.copy-box:focus{
+  border-color:rgba(147,197,253,.55);
+  box-shadow:0 0 0 4px rgba(93,167,255,.12);
+}
+.copy-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-top:10px;
+  flex-wrap:wrap;
+}
+.copy-status{
+  color:#9ee6b6;
+  font-size:13px;
+  min-height:18px;
+}
+@media(max-width:760px){
+  #page-dashboard .grid{
+    grid-template-columns:repeat(2,1fr);
+    gap:7px;
+  }
+  #page-dashboard .stat{
+    min-height:74px;
+    padding:10px;
+    border-radius:16px;
+  }
+  #page-dashboard .stat b{
+    font-size:26px;
+  }
+  #page-dashboard .stat small{
+    font-size:11px;
+  }
+}
+/* ===== COMPACT DASHBOARD END ===== */
+
+
+/* ===== 2-LINE COMPACT DASHBOARD CARD START ===== */
+#page-dashboard #dashboardOverviewCards{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+}
+.student-card.compact{
+  padding:10px 12px!important;
+  border-radius:16px!important;
+  background:rgba(255,255,255,.06)!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:5px!important;
+  min-height:auto!important;
+}
+.student-card.compact .line1,
+.student-card.compact .line2{
+  display:flex!important;
+  justify-content:space-between!important;
+  align-items:center!important;
+  gap:10px!important;
+}
+.student-card.compact .name{
+  font-weight:900!important;
+  font-size:15px!important;
+  color:#fff!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  white-space:nowrap!important;
+}
+.student-card.compact .stars{
+  font-size:13px!important;
+  white-space:nowrap!important;
+  color:#facc15!important;
+}
+.student-card.compact .line2{
+  font-size:13px!important;
+  color:#cbd5e1!important;
+}
+.student-card.compact .rate{
+  color:#93c5fd!important;
+  font-weight:900!important;
+}
+/* ===== 2-LINE COMPACT DASHBOARD CARD END ===== */
+
+
+/* ===== COMPACT CHURCH PAGE START ===== */
+.compact-church-panel{
+  padding:14px!important;
+  border-radius:22px!important;
+}
+.compact-church-panel .panel-head{
+  margin-bottom:10px!important;
+}
+.compact-church-panel .panel-head h3{
+  font-size:20px!important;
+}
+.compact-church-form{
+  display:grid;
+  grid-template-columns:1fr 92px;
+  gap:9px;
+  align-items:center;
+}
+.compact-church-form .input{
+  height:48px;
+  border-radius:16px;
+}
+.compact-church-form .btn{
+  height:48px;
+  border-radius:16px;
+  padding:0 14px;
+}
+.church-list-compact{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.church-row-compact{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 11px;
+  border-radius:17px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.11);
+}
+.church-row-compact.active{
+  background:linear-gradient(135deg,rgba(248,113,113,.20),rgba(255,255,255,.055));
+  border-color:rgba(248,113,113,.34);
+}
+.church-row-name{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+  color:#fff;
+  font-size:16px;
+  font-weight:900;
+}
+.church-row-name span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.church-row-name i{
+  color:#fecaca;
+  font-size:18px;
+}
+@media(max-width:560px){
+  .compact-church-form{
+    grid-template-columns:1fr 78px;
+  }
+  .compact-church-form .input,
+  .compact-church-form .btn{
+    height:44px;
+    border-radius:14px;
+  }
+}
+/* ===== COMPACT CHURCH PAGE END ===== */
+
+
+/* ===== COMPACT PASTOR PAGE START ===== */
+.compact-pastor-panel{
+  padding:14px!important;
+  border-radius:22px!important;
+}
+.compact-pastor-panel .panel-head{
+  margin-bottom:10px!important;
+}
+.compact-pastor-panel .panel-head h3{
+  font-size:20px!important;
+}
+.compact-pastor-form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.compact-pastor-form .input,
+.compact-pastor-form .btn{
+  height:46px;
+  border-radius:16px;
+}
+.compact-pastor-form #pastorUid,
+.compact-pastor-form .blue-glass-select,
+.compact-pastor-form .compact-save-btn{
+  grid-column:1/-1;
+}
+.blue-glass-select{
+  border:1px solid rgba(93,167,255,.38)!important;
+  background:
+    linear-gradient(135deg,rgba(93,167,255,.22),rgba(122,121,255,.12)),
+    rgba(255,255,255,.075)!important;
+  color:#dbeafe!important;
+  font-weight:900!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 8px 22px rgba(59,130,246,.12)!important;
+}
+.blue-glass-select option{
+  background:#1f2937!important;
+  color:#fff!important;
+}
+.pastor-list-compact{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.pastor-row-compact{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:10px 11px;
+  border-radius:17px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.11);
+}
+.pastor-row-info{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.pastor-row-info .line1,
+.pastor-row-info .line2{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-width:0;
+}
+.pastor-row-name{
+  font-size:16px;
+  font-weight:900;
+  color:#fff;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.pastor-row-church{
+  flex:0 0 auto;
+  max-width:120px;
+  border:1px solid rgba(93,167,255,.34);
+  background:rgba(93,167,255,.14);
+  color:#bfdbfe;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:11px;
+  font-weight:900;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.pastor-row-info .line2{
+  color:#aab7ca;
+  font-size:12px;
+}
+.pastor-row-info .line2 span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+@media(max-width:560px){
+  .compact-pastor-form{
+    grid-template-columns:1fr;
+  }
+  .compact-pastor-form .input,
+  .compact-pastor-form .btn{
+    height:44px;
+    border-radius:14px;
+  }
+  .pastor-row-compact{
+    grid-template-columns:1fr 62px;
+    padding:9px;
+  }
+  .pastor-row-info .line1,
+  .pastor-row-info .line2{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:2px;
+  }
+  .pastor-row-church{
+    max-width:100%;
+  }
+}
+/* ===== COMPACT PASTOR PAGE END ===== */
+
+
+/* ===== iOS TOUCH FEEDBACK SYSTEM START ===== */
+*{
+  -webkit-tap-highlight-color: transparent!important;
+}
+button,
+a,
+input,
+select,
+textarea,
+.nav-btn,
+.btn,
+.church-switch-btn,
+.church-option,
+.week-arrow,
+.status-btn,
+.home-check-box,
+.student-card,
+.pastor-row-compact,
+.church-row-compact{
+  -webkit-touch-callout:none;
+}
+button,
+a,
+.nav-btn,
+.btn,
+.church-switch-btn,
+.church-option,
+.week-arrow,
+.status-btn,
+.student-card,
+.pastor-row-compact,
+.church-row-compact{
+  position:relative;
+  overflow:hidden;
+  transform:translateZ(0);
+  transition:
+    transform .16s cubic-bezier(.2,.8,.2,1),
+    opacity .16s ease,
+    background .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease,
+    filter .18s ease;
+}
+button:focus,
+a:focus,
+input:focus,
+select:focus,
+textarea:focus{
+  outline:none!important;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+  box-shadow:
+    0 0 0 4px rgba(93,167,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.16)!important;
+}
+button:active,
+a:active,
+.nav-btn:active,
+.btn:active,
+.church-switch-btn:active,
+.church-option:active,
+.week-arrow:active,
+.status-btn:active,
+.student-card:active,
+.pastor-row-compact:active,
+.church-row-compact:active{
+  transform:scale(.965) translateZ(0);
+  opacity:.92;
+  filter:saturate(1.08) brightness(1.08);
+}
+.ios-pressing{
+  transform:scale(.965) translateZ(0)!important;
+  opacity:.92!important;
+  filter:saturate(1.08) brightness(1.08)!important;
+}
+.ios-ripple{
+  position:absolute;
+  width:14px;
+  height:14px;
+  border-radius:999px;
+  pointer-events:none;
+  transform:translate(-50%,-50%) scale(1);
+  background:radial-gradient(circle,rgba(255,255,255,.46) 0%,rgba(147,197,253,.28) 42%,rgba(255,255,255,0) 72%);
+  animation:iosRipple .58s cubic-bezier(.2,.8,.2,1) forwards;
+  z-index:20;
+}
+@keyframes iosRipple{
+  0%{opacity:.95;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(18)}
+}
+input,
+select,
+textarea{
+  transition:
+    box-shadow .18s ease,
+    border-color .18s ease,
+    background .18s ease,
+    transform .16s cubic-bezier(.2,.8,.2,1);
+}
+input:active,
+select:active,
+textarea:active{
+  transform:scale(.992);
+}
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:rgba(147,197,253,.62)!important;
+  box-shadow:0 0 0 4px rgba(93,167,255,.13),inset 0 1px 0 rgba(255,255,255,.14)!important;
+}
+.home-check-box{
+  transition:
+    transform .16s cubic-bezier(.2,.8,.2,1),
+    box-shadow .18s ease,
+    background .18s ease,
+    border-color .18s ease;
+}
+.home-check-box:active{
+  transform:scale(.88)!important;
+}
+.home-check-box:checked{
+  animation:checkPop .24s cubic-bezier(.2,.9,.2,1);
+}
+@keyframes checkPop{
+  0%{transform:scale(.84)}
+  70%{transform:scale(1.08)}
+  100%{transform:scale(1)}
+}
+@media (prefers-reduced-motion: reduce){
+  button,a,input,select,textarea,.nav-btn,.btn,.church-switch-btn,.church-option,.week-arrow,.status-btn,.home-check-box{
+    transition:none!important;
+    animation:none!important;
+  }
+  .ios-ripple{display:none!important}
+}
+/* ===== iOS TOUCH FEEDBACK SYSTEM END ===== */
+
+
+/* ===== OFFLINE + AUTO SAVE + SMOOTH LIST START ===== */
+.sync-status-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  max-width:150px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(112,220,155,.32);
+  background:linear-gradient(135deg,rgba(112,220,155,.18),rgba(255,255,255,.06));
+  color:#bbf7d0;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.sync-status-badge.saving{
+  border-color:rgba(250,204,21,.38);
+  background:linear-gradient(135deg,rgba(250,204,21,.18),rgba(255,255,255,.06));
+  color:#fde68a;
+}
+.sync-status-badge.offline{
+  border-color:rgba(147,197,253,.38);
+  background:linear-gradient(135deg,rgba(93,167,255,.18),rgba(255,255,255,.06));
+  color:#dbeafe;
+}
+.sync-status-badge.error{
+  border-color:rgba(255,125,138,.38);
+  background:linear-gradient(135deg,rgba(255,125,138,.18),rgba(255,255,255,.06));
+  color:#fecaca;
+}
+#homeAttendanceBody tr{
+  will-change:transform,opacity;
+  transition:
+    transform .42s cubic-bezier(.22,1,.36,1),
+    opacity .24s ease,
+    filter .28s ease;
+}
+#homeAttendanceBody tr.flip-moving{
+  position:relative;
+  z-index:3;
+  filter:brightness(1.16) saturate(1.08);
+}
+#homeAttendanceBody tr.row-enter{
+  animation:rowEnter .32s cubic-bezier(.2,.9,.2,1);
+}
+@keyframes rowEnter{
+  0%{opacity:0;transform:translateY(8px) scale(.985)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+.auto-save-pulse{
+  animation:autoSavePulse .42s cubic-bezier(.2,.9,.2,1);
+}
+@keyframes autoSavePulse{
+  0%{box-shadow:0 0 0 rgba(112,220,155,0)}
+  45%{box-shadow:0 0 0 5px rgba(112,220,155,.14),0 0 28px rgba(112,220,155,.16)}
+  100%{box-shadow:0 0 0 rgba(112,220,155,0)}
+}
+/* ===== OFFLINE + AUTO SAVE + SMOOTH LIST END ===== */
+
+
+/* ===== COMPACT STUDENT PAGE START ===== */
+.compact-student-panel{
+  padding:14px!important;
+  border-radius:22px!important;
+}
+.compact-action-head{
+  margin-bottom:10px!important;
+}
+.compact-action-head h3{
+  font-size:20px!important;
+}
+.compact-action-head .btn-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.compact-action-head .btn{
+  min-width:62px;
+  height:38px;
+  border-radius:14px;
+  padding:0 12px;
+}
+.compact-student-form{
+  display:grid;
+  grid-template-columns:1.4fr .75fr;
+  gap:9px;
+}
+.compact-student-form #studentChurch,
+.compact-student-form #studentClass{
+  grid-column:auto;
+}
+.compact-student-form #studentAge{
+  grid-column:1/-1;
+}
+.modern-input{
+  min-height:46px!important;
+  border-radius:16px!important;
+  border:1px solid rgba(255,255,255,.13)!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.095),rgba(255,255,255,.055)),
+    rgba(255,255,255,.06)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.13),0 8px 22px rgba(0,0,0,.08)!important;
+}
+.modern-input::placeholder{
+  color:#aab7ca!important;
+}
+.modern-select{
+  appearance:none;
+  -webkit-appearance:none;
+  background-image:
+    linear-gradient(45deg,transparent 50%,#dbeafe 50%),
+    linear-gradient(135deg,#dbeafe 50%,transparent 50%),
+    linear-gradient(180deg,rgba(255,255,255,.095),rgba(255,255,255,.055))!important;
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 12px) 50%,
+    0 0!important;
+  background-size:6px 6px,6px 6px,100% 100%!important;
+  background-repeat:no-repeat!important;
+  padding-right:34px!important;
+}
+.compact-search{
+  max-width:250px;
+  min-height:40px!important;
+}
+.student-row-compact{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:10px 11px;
+  border-radius:17px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.11);
+}
+.student-row-info{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.student-row-info .line1,
+.student-row-info .line2{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.student-row-name{
+  color:#fff;
+  font-size:16px;
+  font-weight:900;
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.student-row-gender{
+  flex:0 0 auto;
+  border:1px solid rgba(147,197,253,.34);
+  background:rgba(93,167,255,.14);
+  color:#bfdbfe;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:11px;
+  font-weight:900;
+}
+.student-row-info .line2{
+  color:#aab7ca;
+  font-size:12px;
+}
+.student-row-info .line2 .stars{
+  white-space:nowrap;
+  color:#facc15;
+  font-size:12px;
+}
+@media(max-width:560px){
+  .compact-student-form{
+    grid-template-columns:1.2fr .75fr;
+    gap:8px;
+  }
+  .modern-input{
+    min-height:44px!important;
+    border-radius:14px!important;
+  }
+  .compact-action-head{
+    align-items:center!important;
+  }
+  .compact-action-head h3{
+    font-size:19px!important;
+  }
+  .student-row-compact{
+    padding:9px;
+    grid-template-columns:1fr 60px;
+  }
+  .student-row-info .line2{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:2px;
+  }
+  .compact-search{
+    max-width:100%;
+  }
+}
+/* ===== COMPACT STUDENT PAGE END ===== */
+
+
+/* ===== COMPACT TEACHER PAGE START ===== */
+.compact-teacher-panel{
+  padding:14px!important;
+  border-radius:22px!important;
+}
+.compact-teacher-panel .panel-head{
+  margin-bottom:10px!important;
+}
+.compact-teacher-panel .panel-head h3{
+  font-size:20px!important;
+}
+.compact-teacher-form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.compact-teacher-form #teacherUid{
+  grid-column:1/-1;
+}
+.compact-teacher-form .input,
+.compact-class-form .input{
+  min-height:46px!important;
+  border-radius:16px!important;
+}
+.compact-class-form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+.teacher-list-compact{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.teacher-row-compact{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:10px 11px;
+  border-radius:17px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.11);
+}
+.teacher-row-info{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+.teacher-row-info .line1,
+.teacher-row-info .line2{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-width:0;
+}
+.teacher-row-name{
+  font-size:16px;
+  font-weight:900;
+  color:#fff;
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.teacher-row-class{
+  flex:0 0 auto;
+  max-width:120px;
+  border:1px solid rgba(93,167,255,.34);
+  background:rgba(93,167,255,.14);
+  color:#bfdbfe;
+  border-radius:999px;
+  padding:3px 8px;
+  font-size:11px;
+  font-weight:900;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.teacher-row-info .line2{
+  color:#aab7ca;
+  font-size:12px;
+}
+.teacher-row-info .line2 span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+@media(max-width:560px){
+  .compact-teacher-form,
+  .compact-class-form{
+    grid-template-columns:1fr;
+    gap:8px;
+  }
+  .compact-teacher-form .input,
+  .compact-class-form .input{
+    min-height:44px!important;
+    border-radius:14px!important;
+  }
+  .teacher-row-compact{
+    grid-template-columns:1fr 60px;
+    padding:9px;
+  }
+  .teacher-row-info .line1,
+  .teacher-row-info .line2{
+    align-items:flex-start;
+    flex-direction:column;
+    gap:2px;
+  }
+  .teacher-row-class{
+    max-width:100%;
+  }
+}
+/* ===== COMPACT TEACHER PAGE END ===== */
+
+
+/* ===== LANGUAGE SWITCH START ===== */
+.lang-toggle-btn{
+  border:1px solid rgba(147,197,253,.34);
+  background:linear-gradient(135deg,rgba(93,167,255,.22),rgba(122,121,255,.12));
+  color:#dbeafe;
+  border-radius:999px;
+  height:30px;
+  min-width:42px;
+  padding:0 10px;
+  font-size:12px;
+  font-weight:900;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 8px 20px rgba(59,130,246,.12);
+}
+body.lang-kh{
+  font-family:"Kantumruy Pro","DM Sans",system-ui,sans-serif;
+}
+body.lang-kh .ios-nav .nav-btn{
+  font-size:9px;
+}
+body.lang-kh .ios-brand span{
+  font-family:"Kantumruy Pro","DM Sans",sans-serif;
+}
+/* ===== LANGUAGE SWITCH END ===== */
+
+
+/* ===== ROLE + STUDENT DETAIL START ===== */
+.hidden{display:none!important}
+.student-row-actions{
+  display:flex;
+  gap:6px;
+  flex:0 0 auto;
+}
+.student-detail-box{
+  margin-top:14px;
+  padding:14px;
+  border-radius:20px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.045));
+  border:1px solid rgba(255,255,255,.12);
+}
+.student-detail-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:12px;
+}
+.student-detail-head h3{
+  margin:0 0 4px;
+  color:#fff;
+}
+.student-detail-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:12px;
+}
+.student-detail-stats div{
+  border:1px solid rgba(93,167,255,.24);
+  background:rgba(93,167,255,.10);
+  border-radius:16px;
+  padding:10px;
+}
+.student-detail-stats small{
+  display:block;
+  color:#bfdbfe;
+  font-weight:900;
+  font-size:12px;
+}
+.student-detail-stats b{
+  color:#fff;
+  font-size:26px;
+}
+.student-week-list{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.student-week-row{
+  display:grid;
+  grid-template-columns:70px 1fr 40px;
+  align-items:center;
+  gap:8px;
+  padding:9px 10px;
+  border-radius:14px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.10);
+  color:#dbeafe;
+}
+.student-week-row.checked{
+  background:linear-gradient(135deg,rgba(112,220,155,.18),rgba(255,255,255,.055));
+  border-color:rgba(112,220,155,.28);
+}
+.student-week-row b{
+  text-align:center;
+}
+@media(max-width:560px){
+  .student-row-actions{
+    flex-direction:column;
+  }
+  .student-row-actions .btn{
+    padding:6px 8px;
+    font-size:11px;
+  }
+}
+/* ===== ROLE + STUDENT DETAIL END ===== */
+
+
+/* ===== LOGIN KEY EYE TOGGLE START ===== */
+.login-card .brand h1{
+  font-family:"Kantumruy Pro","DM Sans",sans-serif;
+  font-size:30px;
+  line-height:1.25;
+}
+.key-input-wrap{
+  position:relative;
+}
+.key-input-wrap .input{
+  padding-right:52px!important;
+}
+.key-toggle{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:12px;
+  background:rgba(255,255,255,.08);
+  color:#dbeafe;
+  display:grid;
+  place-items:center;
+  font-size:18px;
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+}
+.key-toggle:hover{
+  background:rgba(255,255,255,.14);
+  color:#fff;
+}
+.key-toggle:active{
+  transform:translateY(-50%) scale(.94)!important;
+}
+/* ===== LOGIN KEY EYE TOGGLE END ===== */
+
+
+/* ===== COMPACT LOGIN POSITION + KEY ACTION START ===== */
+.login-wrap{
+  align-items:start!important;
+  place-items:start center!important;
+  padding-top:30vh!important;
+}
+.login-card{
+  transform:translateY(-50%)!important;
+}
+.key-input-wrap .input{
+  padding-right:96px!important;
+}
+.key-toggle{
+  right:58px!important;
+}
+.key-login-btn{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  width:40px;
+  height:40px;
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(135deg,#5da7ff,#7a79ff);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-size:21px;
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 10px 22px rgba(93,167,255,.24);
+}
+.key-login-btn:hover{
+  filter:brightness(1.08);
+}
+.key-login-btn:active{
+  transform:translateY(-50%) scale(.94)!important;
+}
+@media(max-width:560px){
+  .login-wrap{
+    padding-top:32vh!important;
+  }
+  .login-card{
+    width:min(92vw,430px)!important;
+  }
+}
+/* ===== COMPACT LOGIN POSITION + KEY ACTION END ===== */
+
+
+/* ===== MEMBER LOGIN / MODERN CIRCLE CHECK START ===== */
+.member-panel{
+  padding:14px!important;
+  border-radius:22px!important;
+}
+.member-profile-card{
+  padding:14px;
+  border-radius:20px;
+  background:linear-gradient(135deg,rgba(93,167,255,.16),rgba(255,255,255,.055));
+  border:1px solid rgba(147,197,253,.20);
+  margin-bottom:12px;
+}
+.member-name-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.member-name-row h3{
+  margin:0 0 4px;
+  color:#fff;
+}
+.member-name-row p{
+  margin:0;
+  color:#aab7ca;
+  font-size:13px;
+}
+.member-count{
+  flex:0 0 auto;
+  min-width:86px;
+  text-align:center;
+  border-radius:16px;
+  padding:8px 10px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.12);
+}
+.member-count small{
+  display:block;
+  color:#bfdbfe;
+  font-size:11px;
+  font-weight:900;
+}
+.member-count b{
+  color:#fff;
+  font-size:20px;
+}
+.member-week-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.member-week-item{
+  display:grid;
+  grid-template-columns:42px 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-radius:18px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.10);
+}
+.circle-check{
+  width:36px;
+  height:36px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  color:#94a3b8;
+  background:rgba(255,255,255,.075);
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  font-size:20px;
+}
+.circle-check.checked{
+  color:#fff;
+  background:linear-gradient(135deg,#22c55e,#70dc9b);
+  border-color:rgba(112,220,155,.70);
+  box-shadow:0 10px 24px rgba(34,197,94,.22),inset 0 1px 0 rgba(255,255,255,.28);
+  animation:checkPop .24s cubic-bezier(.2,.9,.2,1);
+}
+.member-week-text{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+.member-week-text b{
+  color:#fff;
+  font-size:14px;
+}
+.member-week-text span{
+  color:#aab7ca;
+  font-size:12px;
+}
+.member-week-item strong{
+  color:#dbeafe;
+  font-size:12px;
+}
+@media(max-width:560px){
+  .member-week-item{
+    grid-template-columns:38px 1fr auto;
+    padding:9px;
+  }
+  .circle-check{
+    width:33px;
+    height:33px;
+  }
+}
+/* ===== MEMBER LOGIN / MODERN CIRCLE CHECK END ===== */
+
+
+/* ===== REMEMBER LOGIN START ===== */
+.remember-login{
+  display:inline-flex!important;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+  color:#dbeafe;
+  font-size:13px;
+  font-weight:900;
+  cursor:pointer;
+  user-select:none;
+}
+.remember-login input{
+  appearance:none;
+  -webkit-appearance:none;
+  width:18px;
+  height:18px;
+  border-radius:999px;
+  border:2px solid rgba(147,197,253,.65);
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.16);
+  cursor:pointer;
+  position:relative;
+}
+.remember-login input:checked{
+  background:linear-gradient(135deg,#5da7ff,#7a79ff);
+  border-color:rgba(219,234,254,.9);
+}
+.remember-login input:checked::after{
+  content:"";
+  position:absolute;
+  left:5px;
+  top:2px;
+  width:4px;
+  height:8px;
+  border-right:2px solid white;
+  border-bottom:2px solid white;
+  transform:rotate(45deg);
+}
+/* ===== REMEMBER LOGIN END ===== */
+
+
+/* ===== CLEAN LOGIN REMEMBER CIRCLE UPDATE START ===== */
+.remember-login{
+  display:none!important;
+}
+.remember-row-clean{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:8px;
+  cursor:pointer;
+  user-select:none;
+}
+.remember-circle{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  background:transparent;
+  transition:all .15s ease;
+}
+.remember-circle.active{
+  background:#5da7ff;
+  border-color:#5da7ff;
+  box-shadow:0 0 0 2px rgba(93,167,255,.12);
+}
+.remember-circle:active{
+  transform:scale(.90);
+}
+.key-toggle,
+.key-login-btn{
+  width:36px!important;
+  height:36px!important;
+  border-radius:12px!important;
+  font-size:18px!important;
+}
+.key-toggle{
+  right:56px!important;
+}
+.key-login-btn{
+  right:12px!important;
+}
+.key-input-wrap .input{
+  padding-right:100px!important;
+}
+/* ===== CLEAN LOGIN REMEMBER CIRCLE UPDATE END ===== */
+
+
+/* ===== PRAYINFO STYLE REMEMBER ROW UPDATE START ===== */
+.remember-row-clean{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:8px;
+  cursor:pointer;
+  user-select:none;
+}
+.remember-row-clean .remember-text{
+  font-size:12px;
+  font-weight:500;
+  color:#cbd5e1;
+}
+.remember-row-clean:hover .remember-text{
+  font-size:12px;
+  font-weight:500;
+  color:#cbd5e1;
+}
+.remember-circle{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  background:transparent;
+  transition:all .15s ease;
+}
+.remember-circle.active{
+  background:#5da7ff;
+  border-color:#5da7ff;
+  box-shadow:0 0 0 2px rgba(93,167,255,.12);
+}
+.remember-circle:active{
+  transform:scale(.90)!important;
+}
+/* ===== PRAYINFO STYLE REMEMBER ROW UPDATE END ===== */
+
+
+/* ===== PRAYINFO EXACT REMEMBER START ===== */
+.remember-row-clean{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-top:8px;
+  cursor:pointer;
+  user-select:none;
+}
+.remember-circle{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);
+  background:transparent;
+  transition:all .15s ease;
+}
+.remember-circle.active{
+  background:#5da7ff;
+  border-color:#5da7ff;
+  box-shadow:0 0 0 2px rgba(93,167,255,.12);
+}
+.remember-circle:active{
+  transform:scale(.82);
+}
+.remember-text{
+  font-size:12px;
+  font-weight:500;
+  color:#cbd5e1;
+}
+.remember-row-clean:hover .remember-text{
+  font-size:12px;
+  font-weight:500;
+  color:#cbd5e1;
+}
+/* ===== PRAYINFO EXACT REMEMBER END ===== */
+
+
+/* ===== SAVE STATUS VISIBILITY FIX START ===== */
+#churchStatus,
+#pastorStatus,
+#teacherStatus,
+#studentStatus,
+#attendanceStatus{
+  display:block;
+  margin-top:8px;
+  min-height:20px;
+  color:#bbf7d0!important;
+  font-weight:800;
+}
+/* ===== SAVE STATUS VISIBILITY FIX END ===== */
+
+
+/* ===== CHURCH + PASTOR LINK FIX START ===== */
+.pastor-linked-church-form{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:9px!important;
+}
+.pastor-linked-church-form .modern-input{
+  min-height:44px!important;
+}
+.church-row-name{
+  flex-wrap:wrap;
+}
+.church-row-name small{
+  width:100%;
+  color:#aab7ca;
+  font-size:12px;
+  font-weight:700;
+  padding-left:28px;
+  margin-top:2px;
+}
+/* ===== CHURCH + PASTOR LINK FIX END ===== */
+
+@media(max-width:980px){
+  .app{padding:8px}
+  .ios-nav{top:8px;align-items:stretch;flex-wrap:wrap;border-radius:22px}
+  .ios-brand{width:100%;justify-content:space-between}
+  .top-church-switch{flex:1 1 100%}
+  .ios-nav-scroll{width:100%;flex:1 1 100%}
+  .ios-nav .nav-btn{min-width:54px;height:40px;font-size:9px}
+  .topbar{padding:10px 12px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .form-grid{grid-template-columns:1fr}
+  
+.week-input,.week-select{
+  min-width:0;height:38px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.075);color:#fff;border-radius:14px;
+  padding:0 10px;outline:none;font-weight:800;
+}
+.week-input{width:126px;flex:0 0 126px}
+.week-select{flex:1;font-size:13px}
+.week-input option,.week-select option{background:#1f2937;color:#fff}
+.week-arrow{
+  width:38px;height:38px;flex:0 0 38px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.08);
+  color:#eaf3ff;display:grid;place-items:center;font-size:20px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10)
+}
+.week-arrow:hover{background:rgba(255,255,255,.15)}
+.current-sunday-pill{
+  flex:0 0 auto;min-width:92px;text-align:center;
+  height:38px;display:flex;align-items:center;justify-content:center;
+  border-radius:999px;border:1px solid rgba(93,167,255,.30);
+  background:linear-gradient(135deg,rgba(93,167,255,.20),rgba(122,121,255,.12));
+  color:#dbeafe;font-size:12px;font-weight:900;white-space:nowrap;
+}
+
+.home-paper{padding:12px;border-radius:18px}
+  .home-paper-head{align-items:flex-start;flex-direction:column}
+  .home-total{width:100%;display:flex;align-items:center;justify-content:space-between}
+  .home-total b{font-size:28px}
+}
+@media(max-width:560px){
+  .grid{grid-template-columns:1fr}
+  .topbar{align-items:flex-start;flex-direction:column}
+  .user-pill{width:100%;justify-content:space-between}
+  .att-row{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .sidebar,.topbar,.btn,.mobile-open{display:none!important}
+  .app{display:block;padding:0}
+  .glass,.panel{background:#fff!important;box-shadow:none!important;border:0!important;color:#111}
+}
+</style>
+</head>
+<body>
+
+
+
+<div id="loginScreen" class="login-wrap">
+  <div class="login-card glass">
+    <div class="brand">
+      <div class="brand-icon"><i class="ri-school-line"></i></div>
+      <h1>គ្រូកុមារ</h1>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input id="email" class="input" type="email" placeholder="admin@email.com">
+    </div>
+    <div class="field">
+      <label>Key</label>
+      <div class="key-input-wrap">
+        <input id="password" class="input" type="password" placeholder="Enter key">
+        <button id="toggleKeyBtn" class="key-toggle" type="button" aria-label="Show key"><i class="ri-eye-line"></i></button>
+        <button id="loginBtn" class="key-login-btn" type="button" aria-label="Login"><i class="ri-arrow-right-line"></i></button>
+      </div>
+    </div>
+    <div class="remember-row-clean">
+  <input id="rememberLogin" type="checkbox" hidden>
+  <div id="rememberLoginBtn" class="remember-circle"></div>
+  <span class="remember-text">Remember Login</span>
+</div>
+    <div id="loginStatus" class="status"></div>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+    <!-- ===== iOS GLASS TOP NAV START ===== -->
+    <nav id="topNav" class="ios-nav glass">
+      <div class="ios-brand">
+        <i class="ri-school-line"></i>
+        <span data-i18n="appTitle">Sunday School</span>
+        <button id="langToggleBtn" class="lang-toggle-btn" type="button">KH</button>
+      </div>
+
+      <div id="churchSwitchWrap" class="church-switch-wrap top-church-switch">
+        <button id="churchSwitchBtn" class="church-switch-btn" type="button">
+          <i class="ri-building-4-line"></i>
+          <span id="activeChurchName">All Churches</span>
+          <i class="ri-arrow-down-s-line"></i>
+        </button>
+        <div id="churchSwitchDropdown" class="church-switch-dropdown"></div>
+      </div>
+
+      <div class="ios-nav-scroll">
+        <button class="nav-btn active" data-page="home" title="Home"><i class="ri-home-5-line"></i><span data-i18n="home">Home</span></button>
+        <button class="nav-btn hidden" data-page="member" title="Member"><i class="ri-user-heart-line"></i><span data-i18n="member">Member</span></button>
+        <button class="nav-btn" data-page="dashboard" title="Dashboard"><i class="ri-dashboard-line"></i><span data-i18n="dash">Dash</span></button>
+        <button id="churchNavSwitchBtn" class="nav-btn" data-page="churches" title="Manage Church"><i class="ri-building-4-line"></i><span data-i18n="church">Church</span></button>
+        <button class="nav-btn" data-page="pastors" title="Pastors"><i class="ri-user-star-line"></i><span data-i18n="pastor">Pastor</span></button>
+        <button class="nav-btn" data-page="teachers" title="Teachers"><i class="ri-user-voice-line"></i><span data-i18n="teacher">Teacher</span></button>
+        <button class="nav-btn" data-page="students" title="Students"><i class="ri-group-line"></i><span data-i18n="student">Student</span></button>
+        <button class="nav-btn" data-page="attendance" title="Attendance"><i class="ri-checkbox-circle-line"></i><span data-i18n="attend">Attend</span></button>
+        <button class="nav-btn" data-page="analytics" title="Analytics"><i class="ri-star-line"></i><span data-i18n="stars">Stars</span></button>
+        <button class="nav-btn" data-page="settings" title="Settings"><i class="ri-settings-3-line"></i><span>Setting</span></button>
+      </div>
+    </nav>
+    <!-- ===== iOS GLASS TOP NAV END ===== -->
+
+
+  <main class="main">
+    <div class="topbar glass">
+      <h2 id="pageTitle">Home</h2>
+      <div class="user-pill">
+        <button id="topChurchBadge" class="top-church-badge" type="button" title="Click to switch church">All Churches</button>
+        <span id="syncStatusBadge" class="sync-status-badge">Realtime</span>
+        <span id="userText">Loading...</span>
+        <button id="logoutBtn" class="btn small">Logout</button>
+      </div>
+    </div>
+
+
+    <section id="page-member" class="page">
+      <div class="panel glass member-panel">
+        <div class="panel-head">
+          <h3 data-i18n="myAttendance">My Attendance</h3>
+          <span id="memberMonthBadge" class="badge"></span>
+        </div>
+
+        <div id="memberProfileCard" class="member-profile-card"></div>
+
+        <div class="member-week-wrap">
+          <div id="memberWeekList" class="member-week-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-home" class="page active">
+      <div class="panel glass">
+        <div class="panel-head">
+          <div>
+            <h3 data-i18n="homeAttendanceList">Home Attendance List</h3>
+            <div class="muted">Swap Sunday week of the selected month</div>
+          </div>
+          <span id="todayDate" class="badge"></span>
+        </div>
+
+        <div id="weekSwipeArea" class="week-swap glass">
+          <div id="weekSwipeWipe" class="week-swipe-wipe"></div>
+          <button id="prevWeekBtn" class="week-arrow" type="button"><i class="ri-arrow-left-s-line"></i></button>
+          <div class="week-center">
+            <input id="homeMonth" class="week-input" type="month">
+            <select id="homeWeekSelect" class="week-select"></select>
+          </div>
+          <div id="currentSundayPill" class="current-sunday-pill">Sunday</div>
+          <button id="nextWeekBtn" class="week-arrow" type="button"><i class="ri-arrow-right-s-line"></i></button>
+        </div>
+
+        <div class="home-paper">
+          <div class="home-paper-head">
+            <div>
+              <div class="home-title" data-i18n="studentAttendance">Student Attendance</div>
+              <div id="homeSundayDate" class="home-date">Date Sunday</div>
+            </div>
+            <div class="home-total">
+              <span>Total Present</span>
+              <b id="homeTotalPresent">0</b>
+            </div>
+          </div>
+
+          <div class="table-wrap home-table-wrap">
+            <table class="home-table">
+              <thead>
+                <tr>
+                  <th style="width:70px">No.</th>
+                  <th>Name</th>
+                  <th style="width:110px">Check</th>
+                </tr>
+              </thead>
+              <tbody id="homeAttendanceBody"></tbody>
+            </table>
+          </div>
+
+          <div class="home-summary">
+            <span>Total Students: <b id="homeTotalStudents">0</b></span>
+            <span>Present: <b id="homeSummaryPresent">0</b></span>
+            <span>Absent: <b id="homeSummaryAbsent">0</b></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+    <section id="page-dashboard" class="page">
+      <div class="grid">
+        <div class="stat glass"><small>Total Students</small><b id="statStudents">0</b></div>
+        <div class="stat glass"><small>Present This Week</small><b id="statPresent">0</b></div>
+        <div class="stat glass"><small>Absent This Week</small><b id="statAbsent">0</b></div>
+        <div class="stat glass"><small>Top Stars</small><b id="statStars">0</b></div>
+      </div>
+      <div class="panel glass">
+        <div class="panel-head">
+          <h3 data-i18n="copyMessenger">Copy Text for Messenger</h3>
+          <button id="copyMessengerBtn" class="btn primary small" type="button"><i class="ri-file-copy-line"></i> Copy</button>
+        </div>
+        <textarea id="messengerCopyText" class="copy-box" readonly></textarea>
+        <div class="copy-actions">
+          <span class="muted">Format: Khmer student list by selected church</span>
+          <span id="copyMessengerStatus" class="copy-status"></span>
+        </div>
+      </div>
+
+      <div class="panel glass">
+        <div class="panel-head">
+          <h3 data-i18n="dashboardOverview">Dashboard Overview</h3>
+          <span id="dashboardDateBadge" class="badge"></span>
+        </div>
+        <div id="dashboardOverviewCards" class="cards"></div>
+      </div>
+    </section>
+
+    <section id="page-churches" class="page">
+      <div class="panel glass compact-church-panel">
+        <div class="panel-head compact-action-head">
+          <h3 data-i18n="createChurch">Create Church</h3>
+          <div class="btn-row">
+            <button id="clearChurchBtn" class="btn small">New</button>
+            <button id="saveChurchBtn" class="btn primary small">Save</button>
+          </div>
+        </div>
+
+        <div class="compact-church-form pastor-linked-church-form">
+          <input id="churchName" class="input modern-input" placeholder="បញ្ចូលឈ្មោះពួកជំនុំ">
+          <input id="churchPastorUid" class="input modern-input" placeholder="Pastor Firebase UID">
+          <input id="churchPastorEmail" class="input modern-input" placeholder="pastor@email.com">
+          <input id="churchPastorName" class="input modern-input" placeholder="Pastor name">
+        </div>
+        <div id="churchStatus" class="status"></div>
+      </div>
+
+      <div class="panel glass compact-church-panel">
+        <div class="panel-head">
+          <h3 data-i18n="churchList">Church List</h3>
+        </div>
+        <div id="churchCards" class="church-list-compact"></div>
+      </div>
+    </section>
+
+    <section id="page-pastors" class="page">
+      <div class="panel glass compact-pastor-panel">
+        <div class="panel-head">
+          <h3 data-i18n="createPastor">Create Pastor</h3>
+          <button id="clearPastorBtn" class="btn small">New</button>
+        </div>
+        <div class="compact-pastor-form">
+          <input id="pastorName" class="input" placeholder="Pastor name">
+          <input id="pastorEmail" class="input" placeholder="Pastor email">
+          <input id="pastorUid" class="input" placeholder="Pastor Firebase UID">
+          <select id="pastorChurch" class="input blue-glass-select"></select>
+          <button id="savePastorBtn" class="btn primary compact-save-btn">Save Pastor</button>
+        </div>
+        <div id="pastorStatus" class="status"></div>
+      </div>
+
+      <div class="panel glass compact-pastor-panel">
+        <div class="panel-head"><h3 data-i18n="pastorList">Pastors List</h3></div>
+        <div id="pastorCards" class="pastor-list-compact"></div>
+      </div>
+    </section>
+
+    <section id="page-teachers" class="page">
+      <div class="panel glass compact-teacher-panel">
+        <div class="panel-head compact-action-head">
+          <h3 data-i18n="createTeacher">Create Teacher</h3>
+          <div class="btn-row">
+            <button id="clearTeacherBtn" class="btn small">New</button>
+            <button id="saveTeacherBtn" class="btn primary small">Save</button>
+          </div>
+        </div>
+
+        <div class="compact-teacher-form">
+          <input id="teacherName" class="input modern-input" placeholder="Teacher name">
+          <input id="teacherEmail" class="input modern-input" placeholder="Teacher email">
+          <input id="teacherUid" class="input modern-input" placeholder="Teacher Firebase UID">
+          <select id="teacherChurch" class="input modern-input modern-select blue-glass-select"></select>
+          <select id="teacherPastor" class="input modern-input modern-select blue-glass-select"></select>
+          <select id="teacherClass" class="input modern-input modern-select blue-glass-select"></select>
+        </div>
+        <div id="teacherStatus" class="status"></div>
+      </div>
+
+      <div class="panel glass compact-teacher-panel">
+        <div class="panel-head compact-action-head">
+          <h3>Classes</h3>
+          <button id="saveClassBtn" class="btn primary small">Add</button>
+        </div>
+        <div class="compact-class-form">
+          <input id="className" class="input modern-input" placeholder="Class name">
+          <select id="classChurch" class="input modern-input modern-select blue-glass-select"></select>
+        </div>
+      </div>
+
+      <div class="panel glass compact-teacher-panel">
+        <div class="panel-head"><h3 data-i18n="teacherList">Teachers List</h3></div>
+        <div id="teacherCards" class="teacher-list-compact"></div>
+      </div>
+    </section>
+
+    <section id="page-students" class="page">
+      <div class="panel glass compact-student-panel">
+        <div class="panel-head compact-action-head">
+          <h3 data-i18n="addEditStudent">Add / Edit Student</h3>
+          <div class="btn-row">
+            <button id="clearStudentBtn" class="btn small">New</button>
+            <button id="saveStudentBtn" class="btn primary small">Save</button>
+          </div>
+        </div>
+
+        <div class="compact-student-form">
+          <input id="studentName" class="input modern-input" placeholder="Student name">
+          <select id="studentGender" class="input modern-input modern-select">
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+
+          <select id="studentChurch" class="input modern-input modern-select blue-glass-select"></select>
+          <select id="studentClass" class="input modern-input modern-select blue-glass-select"></select>
+
+          <input id="studentAge" class="input modern-input" type="number" placeholder="Age">
+        </div>
+
+        <div id="studentStatus" class="status"></div>
+      </div>
+
+      <div class="panel glass compact-student-panel">
+        <div class="panel-head compact-action-head">
+          <h3 data-i18n="studentList">Students List</h3>
+          <input id="studentSearch" class="input modern-input compact-search" placeholder="Search student...">
+        </div>
+        <div id="studentCards" class="cards"></div>
+        <div id="studentDetailBox" class="student-detail-box hidden"></div>
+      </div>
+    </section>
+
+    <section id="page-attendance" class="page">
+      <div class="panel glass">
+        <div class="panel-head"><h3>Mark Sunday Attendance</h3><button id="saveAttendanceBtn" class="btn primary">Save Attendance</button></div>
+        <div class="form-grid" style="margin-bottom:14px">
+          <input id="attendanceDate" class="input" type="date">
+          <select id="attendanceClass" class="input"></select>
+        </div>
+        <div id="attendanceList"></div>
+        <div id="attendanceStatus" class="status"></div>
+      </div>
+    </section>
+
+    <section id="page-analytics" class="page">
+      <div class="panel glass">
+        <div class="panel-head">
+          <h3>Student Stars & Rewards</h3>
+          <button onclick="window.print()" class="btn small">Print Report</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Student</th><th>Class</th><th>Present</th><th>Absent</th><th>Rate</th><th>Stars</th></tr></thead>
+            <tbody id="analyticsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-settings" class="page">
+      <div class="panel glass">
+        <div class="panel-head"><h3>System Settings</h3><button id="seedBtn" class="btn primary">Create Demo Data</button></div>
+        <p class="muted">Current version: Admin-first clean foundation. Later we add pastor and teacher limited access.</p>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              <tr><th>Admin UID</th><td>C7d7qJv1wZYCHb8ELgixR01Hh4E3</td></tr>
+              <tr><th>Database</th><td>Realtime Database</td></tr>
+              <tr><th>Mode</th><td>Demo login now. Firebase login can be turned on later.</td></tr>
+              <tr><th>Admin Flow</th><td>Create Church → Create Pastor UID → Create Teacher UID under Pastor → Create Student</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getDatabase, ref, set, get, update, onValue, push } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+
+const ADMIN_UID = "C7d7qJv1wZYCHb8ELgixR01Hh4E3";
+const firebaseConfig = {
+  apiKey: "AIzaSyD4SGK5Gvo1xtrljap1zay1bwDxlrlGmoY",
+  authDomain: "sunday-school-system-7f1f8.firebaseapp.com",
+  databaseURL: "https://sunday-school-system-7f1f8-default-rtdb.asia-southeast1.firebasedatabase.app/",
+  projectId: "sunday-school-system-7f1f8",
+  storageBucket: "sunday-school-system-7f1f8.firebasestorage.app",
+  messagingSenderId: "855692058999",
+  appId: "1:855692058999:web:b3c41eae77488670b50172"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const DEMO_LOGIN = false; // REAL SYSTEM MODE: Firebase login + role based access.
+
+let state = {
+  churches:{},
+  pastors:{},
+  teachers:{},
+  classes:{},
+  students:{},
+  attendance:{},
+  activeChurchId:"church1",
+  currentChurchId:null,
+  currentPastorId:null,
+  currentTeacherId:null,
+  currentStudentId:null,
+  currentUser:null,
+  currentProfile:null,
+  currentRole:"guest",
+  attendanceDraft:{},
+  selectedStudentDetailId:null
+};
+
+// REALTIME MODE: no offline cache. Firebase is the source of truth.
+let pendingOfflineWrites = {};
+let saveBadgeTimer = null;
+
+function setSyncStatus(text, mode="offline"){
+  const badge = $("syncStatusBadge");
+  if (!badge) return;
+  badge.textContent = text;
+  badge.className = "sync-status-badge " + mode;
+}
+
+function saveLocalCache(){ /* disabled for realtime system */ }
+function loadLocalCache(){ return false; }
+function rememberOfflineWrite(path, value){
+  console.warn("Offline cache disabled. Firebase write failed:", path, value);
+}
+
+async function flushOfflineWrites(){
+  setSyncStatus(navigator.onLine ? "Realtime" : "Offline", navigator.onLine ? "offline" : "error");
+}
+
+function markAutoSaved(){
+  setSyncStatus("Saved", "saving");
+  clearTimeout(saveBadgeTimer);
+  saveBadgeTimer = setTimeout(()=>setSyncStatus("Realtime", "offline"), 1200);
+}
+
+window.addEventListener("online", ()=>setSyncStatus("Realtime", "offline"));
+window.addEventListener("offline", ()=>setSyncStatus("Offline", "error"));
+
+
+
+// ===== iOS TOUCH FEEDBACK SYSTEM START =====
+function setupIOSTouchFeedback(){
+  const selector = [
+    "button",
+    ".nav-btn",
+    ".btn",
+    ".church-switch-btn",
+    ".church-option",
+    ".week-arrow",
+    ".status-btn",
+    ".student-card",
+    ".pastor-row-compact",
+    ".church-row-compact"
+  ].join(",");
+
+  document.addEventListener("pointerdown", e => {
+    const target = e.target.closest(selector);
+    if (!target || target.disabled) return;
+
+    target.classList.add("ios-pressing");
+
+    const rect = target.getBoundingClientRect();
+    const ripple = document.createElement("span");
+    ripple.className = "ios-ripple";
+    ripple.style.left = (e.clientX - rect.left) + "px";
+    ripple.style.top = (e.clientY - rect.top) + "px";
+
+    target.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 620);
+  }, {passive:true});
+
+  ["pointerup","pointercancel","pointerleave"].forEach(type => {
+    document.addEventListener(type, e => {
+      const target = e.target.closest(selector);
+      if (!target) return;
+      setTimeout(() => target.classList.remove("ios-pressing"), 90);
+    }, {passive:true});
+  });
+}
+setupIOSTouchFeedback();
+// ===== iOS TOUCH FEEDBACK SYSTEM END =====
+
+
+
+// ===== LANGUAGE SWITCH START =====
+const I18N = {
+  en: {
+    appTitle:"Sunday School",
+    home:"Home",
+    dash:"Dash",
+    church:"Church",
+    pastor:"Pastor",
+    teacher:"Teacher",
+    student:"Student",
+    attend:"Attend",
+    stars:"Stars",
+    member:"Member",
+    homeTitle:"Home",
+    dashboardTitle:"Dashboard",
+    churchesTitle:"Church",
+    pastorsTitle:"Pastor",
+    teachersTitle:"Teacher",
+    studentsTitle:"Student",
+    attendanceTitle:"Attendance",
+    analyticsTitle:"Analytics",
+    settingsTitle:"Settings",
+    memberTitle:"Member",
+    createChurch:"Create Church",
+    churchList:"Church List",
+    createPastor:"Create Pastor",
+    pastorList:"Pastors List",
+    createTeacher:"Create Teacher",
+    teacherList:"Teachers List",
+    addEditStudent:"Add / Edit Student",
+    studentList:"Students List",
+    homeAttendanceList:"Home Attendance List",
+    studentAttendance:"Student Attendance",
+    copyMessenger:"Copy Text for Messenger",
+    dashboardOverview:"Dashboard Overview",
+    myAttendance:"My Attendance"
+  },
+  kh: {
+    appTitle:"សាលាថ្ងៃអាទិត្យ",
+    home:"ទំព័រ",
+    dash:"របាយ",
+    church:"ពួកជំនុំ",
+    pastor:"គ្រូគង្វាល",
+    teacher:"គ្រូកុមារ",
+    student:"កូនសិស្ស",
+    attend:"វត្តមាន",
+    stars:"ផ្កាយ",
+    member:"សមាជិក",
+    homeTitle:"ទំព័រដើម",
+    dashboardTitle:"របាយការណ៍",
+    churchesTitle:"ពួកជំនុំ",
+    pastorsTitle:"គ្រូគង្វាល",
+    teachersTitle:"គ្រូកុមារ",
+    studentsTitle:"កូនសិស្ស",
+    attendanceTitle:"វត្តមាន",
+    analyticsTitle:"ផ្កាយ",
+    settingsTitle:"ការកំណត់",
+    memberTitle:"សមាជិក",
+    createChurch:"បង្កើតពួកជំនុំ",
+    churchList:"បញ្ជីពួកជំនុំ",
+    createPastor:"បង្កើតគ្រូគង្វាល",
+    pastorList:"បញ្ជីគ្រូគង្វាល",
+    createTeacher:"បង្កើតគ្រូកុមារ",
+    teacherList:"បញ្ជីគ្រូកុមារ",
+    addEditStudent:"បន្ថែម / កែប្រែកូនសិស្ស",
+    studentList:"បញ្ជីកូនសិស្ស",
+    homeAttendanceList:"បញ្ជីវត្តមានកូនសិស្ស",
+    studentAttendance:"វត្តមានកូនសិស្ស",
+    copyMessenger:"ចម្លងអត្ថបទសម្រាប់ Messenger",
+    dashboardOverview:"សង្ខេបរបាយការណ៍",
+    myAttendance:"វត្តមានរបស់ខ្ញុំ"
+  }
+};
+
+let currentLang = localStorage.getItem("sunday_school_lang") || "en";
+
+function t(key){
+  return I18N[currentLang]?.[key] || I18N.en[key] || key;
+}
+
+function applyLanguage(){
+  document.body.classList.toggle("lang-kh", currentLang === "kh");
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key = el.dataset.i18n;
+    el.textContent = t(key);
+  });
+  const btn = document.getElementById("langToggleBtn");
+  if(btn) btn.textContent = currentLang === "kh" ? "EN" : "KH";
+
+  const activePage = document.querySelector(".page.active");
+  if(activePage && document.getElementById("pageTitle")){
+    const name = activePage.id.replace("page-","");
+    setPageTitle(name);
+  }
+
+  if (typeof renderMessengerCopyText === "function") renderMessengerCopyText();
+}
+
+function setPageTitle(name){
+  const titleKeys = {
+    home:"homeTitle",
+    dashboard:"dashboardTitle",
+    churches:"churchesTitle",
+    pastors:"pastorsTitle",
+    teachers:"teachersTitle",
+    students:"studentsTitle",
+    attendance:"attendanceTitle",
+    analytics:"analyticsTitle",
+    settings:"settingsTitle",
+    member:"memberTitle"
+  };
+  const el = document.getElementById("pageTitle");
+  if(el) el.textContent = t(titleKeys[name]) || name;
+}
+
+document.addEventListener("click", e=>{
+  if(e.target && e.target.id === "langToggleBtn"){
+    currentLang = currentLang === "kh" ? "en" : "kh";
+    localStorage.setItem("sunday_school_lang", currentLang);
+    applyLanguage();
+  }
+});
+// ===== LANGUAGE SWITCH END =====
+
+
+const $ = id => document.getElementById(id);
+
+function isAdmin(){ return state.currentRole === "admin"; }
+function isPastor(){ return state.currentRole === "pastor"; }
+function isTeacher(){ return state.currentRole === "teacher"; }
+function isMember(){ return state.currentRole === "member"; }
+function canManageChurch(){ return isAdmin(); }
+function canManagePastor(){ return isAdmin(); }
+function canManageTeacher(){ return isAdmin() || isPastor(); }
+function canCreateStudent(){ return isAdmin() || isTeacher(); }
+function canViewReports(){ return isAdmin() || isPastor() || isTeacher(); }
+function canViewOwnAttendance(){ return isMember(); }
+
+function forceRoleScope(){
+  if (isPastor() || isTeacher() || isMember()) {
+    state.activeChurchId = state.currentProfile?.churchId || state.activeChurchId;
+  }
+}
+
+
+if ($("toggleKeyBtn")) {
+  $("toggleKeyBtn").onclick = () => {
+    const input = $("password");
+    const icon = $("toggleKeyBtn").querySelector("i");
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    icon.className = show ? "ri-eye-off-line" : "ri-eye-line";
+  };
+}
+
+
+if ($("password")) {
+  $("password").addEventListener("keydown", e => {
+    if(e.key === "Enter"){
+      e.preventDefault();
+      $("loginBtn")?.click();
+    }
+  });
+}
+
+
+if ($("rememberLogin")) {
+  $("rememberLogin").checked = localStorage.getItem("ss_remember_login") !== "0";
+}
+
+if ($("password")) {
+  $("password").addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      $("loginBtn")?.click();
+    }
+  });
+}
+
+
+if ($("rememberLoginBtn") && $("rememberLogin")) {
+  const syncRememberCircle = () => {
+    $("rememberLoginBtn").classList.toggle("active", $("rememberLogin").checked);
+  };
+
+  $("rememberLogin").checked = localStorage.getItem("ss_remember_login") !== "0";
+  syncRememberCircle();
+
+  $("rememberLoginBtn").onclick = () => {
+    $("rememberLogin").checked = !$("rememberLogin").checked;
+    localStorage.setItem("ss_remember_login", $("rememberLogin").checked ? "1" : "0");
+    syncRememberCircle();
+  };
+}
+
+
+if (document.querySelector(".remember-row-clean") && $("rememberLoginBtn") && $("rememberLogin")) {
+  document.querySelector(".remember-row-clean").onclick = (e) => {
+    if (e.target.id === "rememberLoginBtn") return;
+    $("rememberLogin").checked = !$("rememberLogin").checked;
+    localStorage.setItem("ss_remember_login", $("rememberLogin").checked ? "1" : "0");
+    $("rememberLoginBtn").classList.toggle("active", $("rememberLogin").checked);
+  };
+}
+
+
+const rememberInput = document.getElementById("rememberLogin");
+const rememberBtn = document.getElementById("rememberLoginBtn");
+
+if(rememberInput && rememberBtn){
+  const saved = localStorage.getItem("ss_remember_login");
+  rememberInput.checked = saved !== "0";
+
+  function updateRememberUI(){
+    rememberBtn.classList.toggle("active", rememberInput.checked);
+  }
+  updateRememberUI();
+
+  document.querySelector(".remember-row-clean").onclick = () => {
+    rememberInput.checked = !rememberInput.checked;
+    localStorage.setItem("ss_remember_login", rememberInput.checked ? "1" : "0");
+    updateRememberUI();
+  };
+}
+
+const sundayDate = () => {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = day === 0 ? 0 : 7 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0,10);
+};
+$("attendanceDate").value = sundayDate();
+$("todayDate").textContent = sundayDate();
+if ($("homeMonth")) $("homeMonth").value = sundayDate().slice(0,7);
+applyLanguage();
+
+function page(name){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.page===name));
+  $("page-"+name).classList.add("active");
+  setPageTitle(name);
+
+  renderAll();
+}
+
+document.querySelectorAll(".nav-btn").forEach(b=>b.onclick=()=>page(b.dataset.page));
+if ($("copyMessengerBtn")) $("copyMessengerBtn").onclick = copyMessengerText;
+
+
+$("loginBtn").onclick = async () => {
+  if (DEMO_LOGIN) {
+    if ($("rememberLogin")?.checked) {
+      localStorage.setItem("ss_remember_demo", "1");
+    } else {
+      localStorage.removeItem("ss_remember_demo");
+    }
+    startDemoAdmin();
+    return;
+  }
+
+  $("loginStatus").textContent = "Logging in...";
+  try{
+    const remember = $("rememberLogin")?.checked !== false;
+    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+    await signInWithEmailAndPassword(auth, $("email").value.trim(), $("password").value);
+    localStorage.setItem("ss_remember_login", remember ? "1" : "0");
+  }catch(e){
+    $("loginStatus").textContent = e.message;
+  }
+};
+
+$("logoutBtn").onclick = async () => {
+  if (DEMO_LOGIN) {
+    $("loginScreen").classList.remove("hidden");
+    $("app").classList.add("hidden");
+
+    return;
+  }
+  await signOut(auth);
+};
+
+function startDemoAdmin(){
+  state.currentUser = {
+    uid: ADMIN_UID,
+    email: "demo-admin@sundayschool.local"
+  };
+
+  $("loginScreen").classList.add("hidden");
+  $("app").classList.remove("hidden");
+
+  $("userText").textContent = "Demo Admin";
+
+  // Built-in demo data, so you can see inside without Firebase read/write.
+  const hasLocalCache = loadLocalCache();
+  if (!hasLocalCache) {
+  state.churches = {
+    church1:{name:"Church 1",active:true},
+    church2:{name:"Church 2",active:true}
+  };
+  state.activeChurchId = "church1";
+  state.pastors = {
+    pastor1:{name:"Pastor Joshua",email:"pastor@example.com",uid:"PASTOR_UID_HERE",churchId:"church1",phone:"",active:true}
+  };
+  state.teachers = {
+    teacher1:{name:"Teacher Mary",email:"teacher@example.com",uid:"TEACHER_UID_HERE",churchId:"church1",pastorId:"pastor1",classId:"class1",phone:"",active:true}
+  };
+  state.classes = {
+    class1:{name:"Kids Class",churchId:"church1",active:true},
+    class2:{name:"Teens Class",churchId:"church1",active:true},
+    class3:{name:"Junior Class",churchId:"church2",active:true}
+  };
+  state.students = {
+    s1:{name:"David",churchId:"church1",classId:"class1",gender:"Male",age:10,parentPhone:"",active:true},
+    s2:{name:"Mary",churchId:"church1",classId:"class1",gender:"Female",age:9,parentPhone:"",active:true},
+    s3:{name:"John",churchId:"church1",classId:"class2",gender:"Male",age:13,parentPhone:"",active:true},
+    s4:{name:"Anna",churchId:"church2",classId:"class3",gender:"Female",age:8,parentPhone:"",active:true}
+  };
+  state.attendance = {
+    [sundayDate()]: {
+      class1: {s1:"present", s2:"absent"},
+      class2: {s3:"late"},
+      class3: {s4:"present"}
+    }
+  };
+  }
+  saveLocalCache();
+  setSyncStatus("Realtime", "offline");
+  renderAll();
+}
+
+onAuthStateChanged(auth, async user => {
+  if (DEMO_LOGIN) return;
+
+  state.currentUser = user;
+  if(!user){
+    $("loginScreen").classList.remove("hidden");
+    $("app").classList.add("hidden");
+    return;
+  }
+
+  try{
+    let profile = null;
+
+    if(user.uid === ADMIN_UID){
+      profile = {
+        uid:user.uid,
+        name:"Thet",
+        email:user.email,
+        role:"admin",
+        churchId:"all",
+        active:true
+      };
+      await set(ref(db,`users/${user.uid}`), profile).catch(()=>{});
+    }else{
+      const snap = await get(ref(db,`users/${user.uid}`));
+      profile = snap.val();
+    }
+
+    if(!profile || profile.active === false){
+      $("loginStatus").textContent = "Your account is not active or not assigned.";
+      await signOut(auth);
+      return;
+    }
+
+    state.currentProfile = profile;
+    state.currentRole = profile.role || "teacher";
+    forceRoleScope();
+
+    $("loginScreen").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    $("userText").textContent = `${profile.name || user.email} • ${state.currentRole}`;
+    applyRoleUI();
+    renderAll();
+    listenData();
+    flushOfflineWrites();
+  }catch(e){
+    $("loginStatus").textContent = e.message;
+    await signOut(auth);
+  }
+});
+
+
+function applyRoleUI(){
+  const hidePage = (pageName, hide) => {
+    document.querySelectorAll(`[data-page="${pageName}"]`).forEach(el=>el.classList.toggle("hidden", hide));
+  };
+
+  hidePage("member", !isMember());
+  hidePage("home", isMember());
+  hidePage("dashboard", isMember() || (!canViewReports()));
+  hidePage("churches", isMember() || !canManageChurch());
+  hidePage("pastors", isMember() || !canManagePastor());
+  hidePage("teachers", isMember() || !canManageTeacher());
+  hidePage("students", isMember());
+  hidePage("attendance", isMember());
+  hidePage("analytics", isMember());
+  hidePage("settings", !isAdmin());
+
+  if ($("churchSwitchWrap")) $("churchSwitchWrap").classList.toggle("hidden", !isAdmin());
+  if ($("topChurchBadge")) $("topChurchBadge").style.pointerEvents = isAdmin() ? "auto" : "none";
+
+  // Forms permissions
+  if ($("saveChurchBtn")) $("saveChurchBtn").classList.toggle("hidden", !canManageChurch());
+  if ($("clearChurchBtn")) $("clearChurchBtn").classList.toggle("hidden", !canManageChurch());
+  if ($("savePastorBtn")) $("savePastorBtn").classList.toggle("hidden", !canManagePastor());
+  if ($("clearPastorBtn")) $("clearPastorBtn").classList.toggle("hidden", !canManagePastor());
+  if ($("saveTeacherBtn")) $("saveTeacherBtn").classList.toggle("hidden", !canManageTeacher());
+  if ($("clearTeacherBtn")) $("clearTeacherBtn").classList.toggle("hidden", !canManageTeacher());
+  if ($("saveStudentBtn")) $("saveStudentBtn").classList.toggle("hidden", !canCreateStudent());
+  if ($("clearStudentBtn")) $("clearStudentBtn").classList.toggle("hidden", !canCreateStudent());
+
+  const activeName = document.querySelector(".page.active")?.id?.replace("page-","");
+  const activeNavHidden = activeName ? document.querySelector(`[data-page="${activeName}"]`)?.classList.contains("hidden") : false;
+  if (activeNavHidden) {
+    if (isMember()) page("member");
+    else if (isTeacher()) page("students");
+    else if (isPastor()) page("dashboard");
+    else page("home");
+  }
+}
+
+function listenData(){
+  onValue(ref(db), snap => {
+    const v = snap.val() || {};
+    state.churches = v.churches || {};
+    state.pastors = v.pastors || {};
+    state.teachers = v.teachers || {};
+    state.classes = v.classes || {};
+    state.students = v.students || {};
+    state.attendance = v.attendance || {};
+    forceRoleScope();
+    saveLocalCache();
+    setSyncStatus(navigator.onLine ? "Synced" : "Realtime", "offline");
+    applyRoleUI();
+    renderAll();
+  });
+}
+
+function renderAll(){
+  renderSelectors();
+  renderChurchSwitch();
+  renderDashboard();
+  renderMessengerCopyText();
+  renderHomeAttendance();
+  renderChurches();
+  renderPastors();
+  renderTeachers();
+  renderStudents();
+  renderAttendance();
+  renderAnalytics();
+  renderMemberPage();
+  applyLanguage();
+}
+
+function renderSelectors(){
+  forceRoleScope();
+
+  const allChurchEntries = Object.entries(state.churches);
+  const roleChurchId = state.currentProfile?.churchId;
+  const churchEntries = isAdmin()
+    ? allChurchEntries
+    : allChurchEntries.filter(([id]) => id === roleChurchId);
+
+  const churchOpts = churchEntries.map(([id,c])=>`<option value="${id}">${c.name}</option>`).join("") || `<option value="church1">Joshua Church</option>`;
+  ["studentChurch","pastorChurch","teacherChurch","classChurch","activeChurchSelect"].forEach(id=>{
+    if($(id)) $(id).innerHTML = churchOpts;
+  });
+
+  const activeChurch = isAdmin() ? (state.activeChurchId || churchEntries[0]?.[0] || "church1") : roleChurchId;
+  if (activeChurch) state.activeChurchId = activeChurch;
+  if ($("activeChurchSelect")) $("activeChurchSelect").value = state.activeChurchId || activeChurch || "church1";
+
+  const classEntries = Object.entries(state.classes).filter(([id,c]) => {
+    if (isAdmin() || isPastor()) return !activeChurch || c.churchId === activeChurch;
+    if (isTeacher()) return id === state.currentProfile?.classId;
+    return false;
+  });
+
+  const classOpts = classEntries.map(([id,c])=>`<option value="${id}">${c.name}</option>`).join("") || `<option value="class1">Kids Class</option>`;
+  ["studentClass","attendanceClass","teacherClass"].forEach(id=>{
+    if($(id)) $(id).innerHTML = classOpts;
+  });
+
+  const pastorEntries = Object.entries(state.pastors).filter(([id,p]) => !activeChurch || p.churchId === activeChurch);
+  const pastorOpts = pastorEntries.map(([id,p])=>`<option value="${id}">${p.name}</option>`).join("") || `<option value="">Select Pastor</option>`;
+  if ($("teacherPastor")) $("teacherPastor").innerHTML = pastorOpts;
+
+  if (isTeacher()) {
+    if ($("studentChurch")) { $("studentChurch").value = state.currentProfile?.churchId || ""; $("studentChurch").disabled = true; }
+    if ($("studentClass")) { $("studentClass").value = state.currentProfile?.classId || ""; $("studentClass").disabled = true; }
+  } else {
+    if ($("studentChurch")) $("studentChurch").disabled = false;
+    if ($("studentClass")) $("studentClass").disabled = false;
+  }
+}
+
+
+function renderChurchSwitch(){
+  const entries = Object.entries(state.churches);
+  const activeId = state.activeChurchId || entries[0]?.[0] || "";
+  const activeName = state.churches[activeId]?.name || "All Churches";
+
+  if ($("activeChurchName")) $("activeChurchName").textContent = activeName;
+  if ($("topChurchBadge")) $("topChurchBadge").textContent = activeName;
+
+  if (!$("churchSwitchDropdown")) return;
+  $("churchSwitchDropdown").innerHTML = entries.map(([id,c]) => `
+    <button class="church-option ${id===activeId?'active':''}" data-red-switch-church="${id}">
+      <span>${c.name}</span>
+      ${id===activeId ? '<small>Active</small>' : '<i class="ri-arrow-right-s-line"></i>'}
+    </button>
+  `).join("") + `
+    <button class="church-option church-create-mini" data-page-open-churches="1">
+      <span><i class="ri-add-circle-line"></i> Add / Manage Church</span>
+      <i class="ri-arrow-right-s-line"></i>
+    </button>
+  `;
+
+  document.querySelectorAll("[data-red-switch-church]").forEach(btn => {
+    btn.onclick = () => {
+      state.activeChurchId = btn.dataset.redSwitchChurch;
+      saveLocalCache();
+      $("churchSwitchWrap")?.classList.remove("open");
+      renderAll();
+    };
+  });
+
+  document.querySelectorAll("[data-page-open-churches]").forEach(btn => {
+    btn.onclick = () => {
+      $("churchSwitchWrap")?.classList.remove("open");
+      page("churches");
+    };
+  });
+}
+
+if ($("churchSwitchBtn")) {
+  $("churchSwitchBtn").onclick = () => $("churchSwitchWrap")?.classList.toggle("open");
+}
+
+if ($("topChurchBadge")) {
+  $("topChurchBadge").onclick = () => switchToNextChurch();
+}
+
+function switchToNextChurch(){
+  const ids = Object.keys(state.churches);
+  if (!ids.length) return;
+  const current = state.activeChurchId || ids[0];
+  const index = ids.indexOf(current);
+  const nextId = ids[(index + 1) % ids.length];
+  state.activeChurchId = nextId;
+  saveLocalCache();
+  $("churchSwitchWrap")?.classList.remove("open");
+  renderAll();
+}
+document.addEventListener("click", e => {
+  const wrap = $("churchSwitchWrap");
+  if (wrap && !wrap.contains(e.target)) wrap.classList.remove("open");
+});
+
+function studentArray(){
+  return Object.entries(state.students)
+    .map(([id,s])=>({id,...s}))
+    .filter(s => {
+      if (isAdmin()) return !state.activeChurchId || s.churchId === state.activeChurchId;
+      if (isPastor()) return s.churchId === state.currentProfile?.churchId;
+      if (isTeacher()) return s.churchId === state.currentProfile?.churchId && s.classId === state.currentProfile?.classId;
+      return false;
+    });
+}
+function className(id){return state.classes[id]?.name || id || "No Class";}
+
+function getMonthDates(){
+  const date = $("attendanceDate").value || sundayDate();
+  return Object.keys(state.attendance).filter(d=>d.slice(0,7)===date.slice(0,7));
+}
+function studentStats(studentId){
+  const dates = getMonthDates();
+  let present=0, absent=0, late=0, total=0;
+  dates.forEach(d=>{
+    Object.values(state.attendance[d] || {}).forEach(classRecord=>{
+      const status = classRecord[studentId];
+      if(status){ total++; if(status==="present")present++; if(status==="absent")absent++; if(status==="late")late++; }
+    });
+  });
+  const rate = total ? Math.round(((present + late*.5)/total)*100) : 0;
+  const stars = rate>=100?5:rate>=80?4:rate>=60?3:rate>=40?2:rate>0?1:0;
+  return {present,absent,late,total,rate,stars};
+}
+
+
+function getSundaysOfMonth(monthValue){
+  const [year, month] = (monthValue || sundayDate().slice(0,7)).split("-").map(Number);
+  const d = new Date(year, month - 1, 1);
+  const sundays = [];
+  while (d.getMonth() === month - 1) {
+    if (d.getDay() === 0) sundays.push(d.toISOString().slice(0,10));
+    d.setDate(d.getDate() + 1);
+  }
+  return sundays;
+}
+function formatShortDate(dateStr){
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+}
+function setupHomeWeeks(){
+  if (!$("homeMonth") || !$("homeWeekSelect")) return;
+  const sundays = getSundaysOfMonth($("homeMonth").value);
+  const current = $("homeWeekSelect").value || sundayDate();
+  $("homeWeekSelect").innerHTML = sundays.map((date, i)=>`<option value="${date}">W${i+1} • ${formatShortDate(date)}</option>`).join("");
+  $("homeWeekSelect").value = sundays.includes(current) ? current : (sundays.includes(sundayDate()) ? sundayDate() : sundays[0] || sundayDate());
+}
+function getSelectedHomeSunday(){
+  setupHomeWeeks();
+  return $("homeWeekSelect")?.value || sundayDate();
+}
+function runWeekWipe(direction){
+  const area = $("weekSwipeArea");
+  if (!area) return;
+  area.classList.remove("swiping-left","swiping-right","week-pop");
+  void area.offsetWidth;
+  area.classList.add(direction === "right" ? "swiping-right" : "swiping-left", "week-pop");
+  setTimeout(()=>area.classList.remove("swiping-left","swiping-right","week-pop"), 460);
+}
+
+function changeHomeWeek(step){
+  setupHomeWeeks();
+  const select = $("homeWeekSelect");
+  if (!select) return;
+  const next = Math.max(0, Math.min(select.options.length - 1, select.selectedIndex + step));
+  if (next === select.selectedIndex) {
+    runWeekWipe(step > 0 ? "left" : "right");
+    return;
+  }
+  runWeekWipe(step > 0 ? "left" : "right");
+  setTimeout(()=>{
+    select.selectedIndex = next;
+    renderAll();
+  }, 150);
+}
+if ($("homeMonth")) $("homeMonth").onchange = () => { setupHomeWeeks(); renderAll(); };
+if ($("homeWeekSelect")) $("homeWeekSelect").onchange = () => { runWeekWipe("left"); renderAll(); };
+if ($("prevWeekBtn")) $("prevWeekBtn").onclick = () => changeHomeWeek(-1);
+if ($("nextWeekBtn")) $("nextWeekBtn").onclick = () => changeHomeWeek(1);
+
+let weekSwipeStartX = 0;
+let weekSwipeStartY = 0;
+if ($("weekSwipeArea")) {
+  $("weekSwipeArea").addEventListener("touchstart", e => {
+    const t = e.touches[0];
+    weekSwipeStartX = t.clientX;
+    weekSwipeStartY = t.clientY;
+  }, {passive:true});
+
+  $("weekSwipeArea").addEventListener("touchend", e => {
+    const t = e.changedTouches[0];
+    const dx = t.clientX - weekSwipeStartX;
+    const dy = t.clientY - weekSwipeStartY;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+      if (dx < 0) changeHomeWeek(1);
+      else changeHomeWeek(-1);
+    }
+  }, {passive:true});
+}
+
+function renderHomeAttendance(){
+  if (!$("homeAttendanceBody")) return;
+  setupHomeWeeks();
+  const tbody = $("homeAttendanceBody");
+
+  // FLIP animation: remember old row positions before re-render.
+  const oldPositions = {};
+  tbody.querySelectorAll("tr[data-row-id]").forEach(row=>{
+    oldPositions[row.dataset.rowId] = row.getBoundingClientRect().top;
+  });
+
+  const date = getSelectedHomeSunday();
+  $("homeSundayDate").textContent = "Date Sunday: " + date;
+  if ($("currentSundayPill")) $("currentSundayPill").textContent = formatShortDate(date);
+
+  const students = studentArray();
+  const classRecords = state.attendance[date] || {};
+
+  const rowsData = students.map((s, originalIndex) => {
+    let status = "";
+    Object.values(classRecords).forEach(classRecord => {
+      if (classRecord && classRecord[s.id]) status = classRecord[s.id];
+    });
+    const checked = status === "present" || status === "late";
+    return { student:s, originalIndex, checked };
+  }).sort((a,b) => {
+    if (a.checked !== b.checked) return a.checked ? -1 : 1;
+    return a.originalIndex - b.originalIndex;
+  });
+
+  let present = rowsData.filter(r => r.checked).length;
+  let absent = Math.max(0, students.length - present);
+
+  const rows = rowsData.map((row, index) => {
+    const s = row.student;
+    return `<tr data-row-id="${s.id}" class="${row.checked ? 'home-row-checked' : 'home-row-unchecked'}">
+      <td>${index + 1}</td>
+      <td>${s.name}</td>
+      <td>
+        <input class="home-check-box" type="checkbox" ${row.checked ? "checked" : ""} data-home-check="${s.id}">
+      </td>
+    </tr>`;
+  }).join("");
+
+  tbody.innerHTML = rows || `<tr><td colspan="3">No students in this church.</td></tr>`;
+
+  $("homeTotalPresent").textContent = present;
+  $("homeTotalStudents").textContent = students.length;
+  $("homeSummaryPresent").textContent = present;
+  $("homeSummaryAbsent").textContent = absent;
+
+  // FLIP animation: move new rows from old positions into place.
+  requestAnimationFrame(()=>{
+    tbody.querySelectorAll("tr[data-row-id]").forEach(row=>{
+      const oldTop = oldPositions[row.dataset.rowId];
+      const newTop = row.getBoundingClientRect().top;
+
+      if (oldTop === undefined) {
+        row.classList.add("row-enter");
+        setTimeout(()=>row.classList.remove("row-enter"), 340);
+        return;
+      }
+
+      const delta = oldTop - newTop;
+      if (Math.abs(delta) > 1) {
+        row.style.transform = `translateY(${delta}px)`;
+        row.classList.add("flip-moving");
+        requestAnimationFrame(()=>{
+          row.style.transform = "";
+        });
+        setTimeout(()=>row.classList.remove("flip-moving"), 460);
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-home-check]").forEach(box => {
+    box.onchange = async () => {
+      await toggleHomeAttendance(box.dataset.homeCheck, box.checked);
+    };
+  });
+}
+
+async function toggleHomeAttendance(studentId, checked){
+  const date = getSelectedHomeSunday();
+  const student = state.students[studentId];
+  if (!student) return;
+  const classId = student.classId || "class1";
+  const status = checked ? "present" : "absent";
+
+  setSyncStatus("Saving...", "saving");
+  try{
+    await set(ref(db,`attendance/${date}/${classId}/${studentId}`), status);
+    setSyncStatus("Realtime", "offline");
+  }catch(e){
+    setSyncStatus("Error", "error");
+    alert("Firebase save failed: " + (e.message || e.code || e));
+    console.error("Attendance save error:", e);
+  }
+}
+
+
+function toKhmerNumber(value){
+  const map = ["០","១","២","៣","៤","៥","៦","៧","៨","៩"];
+  return String(value).replace(/\d/g, d => map[Number(d)]);
+}
+
+function buildMessengerStudentText(){
+  const church = state.churches[state.activeChurchId];
+  const churchNameText = church?.name || "Church";
+  const students = studentArray().filter(s => (s.name || "").trim());
+
+  let lines = [];
+  lines.push(`កូនសិស្ស ${churchNameText}`);
+
+  students.forEach((s, index) => {
+    lines.push(`${toKhmerNumber(index + 1)}. ${s.name}`);
+  });
+
+  lines.push(`សរុបកូនសិស្ស ${churchNameText}: ${toKhmerNumber(students.length)} នាក់`);
+  return lines.join("\n");
+}
+
+
+function autoResizeCopyBox(){
+  const el = $("messengerCopyText");
+  if (!el) return;
+  el.style.height = "auto";
+  el.style.height = (el.scrollHeight + 4) + "px";
+}
+
+function renderMessengerCopyText(){
+  if (!$("messengerCopyText")) return;
+  $("messengerCopyText").value = buildMessengerStudentText();
+  autoResizeCopyBox();
+}
+
+async function copyMessengerText(){
+  const text = buildMessengerStudentText();
+  try{
+    await navigator.clipboard.writeText(text);
+    $("copyMessengerStatus").textContent = "Copied ✅";
+  }catch(e){
+    $("messengerCopyText").select();
+    document.execCommand("copy");
+    $("copyMessengerStatus").textContent = "Copied ✅";
+  }
+  setTimeout(()=>{ if($("copyMessengerStatus")) $("copyMessengerStatus").textContent = ""; }, 1600);
+}
+
+
+function getMemberStudent(){
+  const sid = state.currentProfile?.studentId;
+  if (!sid) return null;
+  const s = state.students[sid];
+  return s ? {id:sid, ...s} : null;
+}
+
+function renderMemberPage(){
+  if (!$("memberProfileCard") || !isMember()) return;
+
+  const month = $("homeMonth")?.value || sundayDate().slice(0,7);
+  if ($("memberMonthBadge")) $("memberMonthBadge").textContent = month;
+
+  const student = getMemberStudent();
+  if (!student) {
+    $("memberProfileCard").innerHTML = `<div class="empty">No student linked to this member account.</div>`;
+    $("memberWeekList").innerHTML = "";
+    return;
+  }
+
+  const sundays = getSundaysOfMonth(month);
+  let presentCount = 0;
+
+  const weekItems = sundays.map((date, index) => {
+    const status = state.attendance[date]?.[student.classId]?.[student.id] || "absent";
+    const checked = status === "present" || status === "late";
+    if (checked) presentCount++;
+    return `<div class="member-week-item">
+      <div class="circle-check ${checked ? 'checked' : ''}">
+        <i class="${checked ? 'ri-check-line' : 'ri-close-line'}"></i>
+      </div>
+      <div class="member-week-text">
+        <b>Week ${index + 1}</b>
+        <span>${date}</span>
+      </div>
+      <strong>${checked ? "Present" : "Absent"}</strong>
+    </div>`;
+  }).join("");
+
+  $("memberProfileCard").innerHTML = `
+    <div class="member-name-row">
+      <div>
+        <h3>${student.name}</h3>
+        <p>${student.gender || "-"} • Age ${student.age || "-"} • ${className(student.classId)}</p>
+      </div>
+      <div class="member-count">
+        <small>Monthly</small>
+        <b>${presentCount}/${sundays.length}</b>
+      </div>
+    </div>
+  `;
+
+  $("memberWeekList").innerHTML = weekItems || `<div class="empty">No Sundays this month.</div>`;
+}
+
+function renderDashboard(){
+  const students = studentArray();
+  const date = getSelectedHomeSunday();
+  let present = 0, absent = 0;
+  Object.values(state.attendance[date] || {}).forEach(cls=>{
+    Object.values(cls).forEach(v=>{ if(v==="present" || v==="late")present++; if(v==="absent")absent++; });
+  });
+  const computedAbsent = absent || Math.max(0, students.length - present);
+  $("statStudents").textContent = students.length;
+  $("statPresent").textContent = present;
+  $("statAbsent").textContent = computedAbsent;
+  $("statStars").textContent = students.filter(s=>studentStats(s.id).stars===5).length;
+  if ($("todayDate")) $("todayDate").textContent = date;
+  if ($("dashboardDateBadge")) $("dashboardDateBadge").textContent = date;
+
+  if ($("dashboardOverviewCards")) {
+    const top = students.map(s => ({...s, stats:studentStats(s.id)}))
+      .sort((a,b)=>b.stats.rate-a.stats.rate)
+      .slice(0,8);
+    $("dashboardOverviewCards").innerHTML = top.map(s => `
+      <div class="student-card compact">
+        <div class="line1">
+          <span class="name">${s.name}</span>
+          <span class="stars">${"⭐".repeat(s.stats.stars) || "No star"}</span>
+        </div>
+        <div class="line2">
+          <span>${className(s.classId)}</span>
+          <span class="rate">${s.stats.rate}%</span>
+        </div>
+      </div>
+    `).join("") || `<div class="empty">No students yet.</div>`;
+  }
+}
+
+
+function churchArray(){return Object.entries(state.churches).map(([id,c])=>({id,...c}));}
+function pastorArray(){return Object.entries(state.pastors).map(([id,p])=>({id,...p}));}
+function teacherArray(){return Object.entries(state.teachers).map(([id,t])=>({id,...t}));}
+function churchName(id){return state.churches[id]?.name || id || "No Church";}
+function pastorName(id){return state.pastors[id]?.name || id || "No Pastor";}
+
+function renderChurches(){
+  if(!$("churchCards")) return;
+  const churches = churchArray();
+  $("churchCards").innerHTML = churches.map(c=>{
+    const pastor = c.pastorUid ? state.pastors[c.pastorUid] : null;
+    return `
+    <div class="church-row-compact ${c.id === state.activeChurchId ? 'active' : ''}">
+      <div class="church-row-name">
+        <i class="ri-building-4-line"></i>
+        <span>${c.name}</span>
+        ${pastor ? `<small>${pastor.email || pastor.name || pastor.uid}</small>` : ``}
+      </div>
+      <button class="btn small" data-edit-church="${c.id}">Edit</button>
+    </div>`;
+  }).join("") || `<div class="empty">No church yet. Add first church.</div>`;
+
+  document.querySelectorAll("[data-edit-church]").forEach(btn=>btn.onclick=()=>{
+    const c = state.churches[btn.dataset.editChurch];
+    const pastor = c.pastorUid ? state.pastors[c.pastorUid] : null;
+    state.currentChurchId = btn.dataset.editChurch;
+    $("churchName").value = c.name || "";
+    if($("churchPastorUid")) $("churchPastorUid").value = c.pastorUid || "";
+    if($("churchPastorEmail")) $("churchPastorEmail").value = pastor?.email || "";
+    if($("churchPastorName")) $("churchPastorName").value = pastor?.name || "";
+  });
+}
+
+$("activeChurchSelect").onchange = e => {
+  state.activeChurchId = e.target.value;
+  renderAll();
+};
+
+$("saveChurchBtn").onclick = async () => {
+  if(!canManageChurch()){
+    $("churchStatus").textContent = "Admin only. Please login with your admin UID.";
+    return;
+  }
+
+  const name = $("churchName").value.trim();
+  const pastorUid = $("churchPastorUid")?.value.trim() || "";
+  const pastorEmail = $("churchPastorEmail")?.value.trim() || "";
+  const pastorNameValue = $("churchPastorName")?.value.trim() || "";
+
+  if(!name){
+    $("churchStatus").textContent = "Please add church name.";
+    return;
+  }
+
+  $("churchStatus").textContent = "Saving to Firebase...";
+  setSyncStatus("Saving...", "saving");
+
+  const id = state.currentChurchId || push(ref(db,"churches")).key;
+  const churchData = {
+    ...(state.churches[id] || {}),
+    name,
+    pastorUid: pastorUid || state.churches[id]?.pastorUid || "",
+    active:true,
+    updatedAt:Date.now()
+  };
+
+  const updates = {};
+  updates[`churches/${id}`] = churchData;
+
+  if(pastorUid){
+    const pastorData = {
+      name: pastorNameValue || pastorEmail || "Pastor",
+      email: pastorEmail,
+      uid: pastorUid,
+      churchId: id,
+      role:"pastor",
+      active:true,
+      updatedAt:Date.now()
+    };
+    const userData = {
+      name: pastorData.name,
+      email: pastorEmail,
+      role:"pastor",
+      churchId: id,
+      active:true
+    };
+    updates[`pastors/${pastorUid}`] = pastorData;
+    updates[`users/${pastorUid}`] = userData;
+  }
+
+  try{
+    await update(ref(db), updates);
+
+    state.currentChurchId = null;
+    $("churchName").value = "";
+    if($("churchPastorUid")) $("churchPastorUid").value = "";
+    if($("churchPastorEmail")) $("churchPastorEmail").value = "";
+    if($("churchPastorName")) $("churchPastorName").value = "";
+
+    $("churchStatus").textContent = pastorUid ? "Church + pastor saved ✅" : "Church saved ✅";
+    setSyncStatus("Realtime", "offline");
+  }catch(e){
+    $("churchStatus").textContent = "Firebase save failed: " + (e.message || e.code || e);
+    setSyncStatus("Error", "error");
+    console.error("Church save error:", e);
+  }
+};
+$("clearChurchBtn").onclick = () => {
+  state.currentChurchId=null;
+  $("churchName").value="";
+  if($("churchPastorUid")) $("churchPastorUid").value="";
+  if($("churchPastorEmail")) $("churchPastorEmail").value="";
+  if($("churchPastorName")) $("churchPastorName").value="";
+};
+
+function renderPastors(){
+  if(!$("pastorCards")) return;
+  const pastors = pastorArray().filter(p=>!state.activeChurchId || p.churchId === state.activeChurchId);
+  $("pastorCards").innerHTML = pastors.map(p=>`
+    <div class="pastor-row-compact">
+      <div class="pastor-row-info">
+        <div class="line1">
+          <span class="pastor-row-name">${p.name}</span>
+          <span class="pastor-row-church">${churchName(p.churchId)}</span>
+        </div>
+        <div class="line2">
+          <span>${p.email || "No email"}</span>
+          <span>UID: ${p.uid || "-"}</span>
+        </div>
+      </div>
+      <button class="btn small" data-edit-pastor="${p.id}">Edit</button>
+    </div>`).join("") || `<div class="empty">No pastor for this church.</div>`;
+  document.querySelectorAll("[data-edit-pastor]").forEach(btn=>btn.onclick=()=>{
+    const p=state.pastors[btn.dataset.editPastor];
+    state.currentPastorId=btn.dataset.editPastor;
+    $("pastorName").value=p.name||""; $("pastorEmail").value=p.email||""; $("pastorUid").value=p.uid||"";
+    $("pastorChurch").value=p.churchId||state.activeChurchId;
+  });
+}
+$("savePastorBtn").onclick = async () => {
+  if(!canManagePastor()) return alert("Admin only.");
+  const name=$("pastorName").value.trim(), uid=$("pastorUid").value.trim();
+  if(!name || !uid){$("pastorStatus").textContent="Please add pastor name and UID.";return;}
+
+  $("pastorStatus").textContent = "Saving to Firebase...";
+  setSyncStatus("Saving...", "saving");
+
+  const id = state.currentPastorId || uid;
+  const data={name,email:$("pastorEmail").value.trim(),uid,churchId:$("pastorChurch").value,role:"pastor",active:true,updatedAt:Date.now()};
+  const userData = {name:data.name,email:data.email,role:"pastor",churchId:data.churchId,active:true};
+
+  try{
+    const updates = {};
+    updates[`pastors/${id}`] = data;
+    updates[`users/${uid}`] = userData;
+    await update(ref(db), updates);
+
+    state.currentPastorId=null;
+    ["pastorName","pastorEmail","pastorUid"].forEach(id=>$(id).value="");
+    $("pastorStatus").textContent="Pastor saved ✅";
+    setSyncStatus("Realtime", "offline");
+  }catch(e){
+    $("pastorStatus").textContent = "Firebase save failed: " + (e.message || e.code || e);
+    setSyncStatus("Error", "error");
+    console.error("Pastor save error:", e);
+  }
+};
+$("clearPastorBtn").onclick = () => {state.currentPastorId=null; ["pastorName","pastorEmail","pastorUid"].forEach(id=>$(id).value="");};
+
+function renderTeachers(){
+  if(!$("teacherCards")) return;
+  const teachers = teacherArray().filter(t=>{
+    if(isAdmin()) return !state.activeChurchId || t.churchId === state.activeChurchId;
+    if(isPastor()) return t.churchId === state.currentProfile?.churchId;
+    if(isTeacher()) return t.uid === state.currentUser?.uid;
+    return false;
+  });
+  $("teacherCards").innerHTML = teachers.map(t=>`
+    <div class="teacher-row-compact">
+      <div class="teacher-row-info">
+        <div class="line1">
+          <span class="teacher-row-name">${t.name}</span>
+          <span class="teacher-row-class">${className(t.classId)}</span>
+        </div>
+        <div class="line2">
+          <span>${t.email || "No email"}</span>
+          <span>Pastor: ${pastorName(t.pastorId)}</span>
+        </div>
+      </div>
+      ${canManageTeacher() ? `<button class="btn small" data-edit-teacher="${t.id}">Edit</button>` : ``}
+    </div>`).join("") || `<div class="empty">No teacher for this church.</div>`;
+
+  document.querySelectorAll("[data-edit-teacher]").forEach(btn=>btn.onclick=()=>{
+    const t=state.teachers[btn.dataset.editTeacher];
+    state.currentTeacherId=btn.dataset.editTeacher;
+    $("teacherName").value=t.name||""; $("teacherEmail").value=t.email||""; $("teacherUid").value=t.uid||"";
+    $("teacherChurch").value=t.churchId||state.activeChurchId; $("teacherPastor").value=t.pastorId||""; $("teacherClass").value=t.classId||"";
+  });
+}
+$("saveTeacherBtn").onclick = async () => {
+  if(!canManageTeacher()) return alert("No permission.");
+  const name=$("teacherName").value.trim(), uid=$("teacherUid").value.trim();
+  if(!name || !uid){$("teacherStatus").textContent="Please add teacher name and UID.";return;}
+
+  $("teacherStatus").textContent = "Saving to Firebase...";
+  setSyncStatus("Saving...", "saving");
+
+  const id = state.currentTeacherId || uid;
+  const data={
+    name,
+    email:$("teacherEmail").value.trim(),
+    uid,
+    churchId:isPastor() ? state.currentProfile.churchId : $("teacherChurch").value,
+    pastorId:isPastor() ? state.currentUser.uid : $("teacherPastor").value,
+    classId:$("teacherClass").value,
+    role:"teacher",
+    active:true,
+    updatedAt:Date.now()
+  };
+  const userData = {name:data.name,email:data.email,role:"teacher",churchId:data.churchId,pastorId:data.pastorId,classId:data.classId,active:true};
+
+  try{
+    const updates = {};
+    updates[`teachers/${id}`] = data;
+    updates[`users/${uid}`] = userData;
+    await update(ref(db), updates);
+
+    state.currentTeacherId=null;
+    ["teacherName","teacherEmail","teacherUid"].forEach(id=>$(id).value="");
+    $("teacherStatus").textContent="Teacher saved ✅";
+    setSyncStatus("Realtime", "offline");
+  }catch(e){
+    $("teacherStatus").textContent = "Firebase save failed: " + (e.message || e.code || e);
+    setSyncStatus("Error", "error");
+    console.error("Teacher save error:", e);
+  }
+};
+$("clearTeacherBtn").onclick = () => {state.currentTeacherId=null; ["teacherName","teacherEmail","teacherUid"].forEach(id=>$(id).value="");};
+
+$("saveClassBtn").onclick = async () => {
+  const name = $("className").value.trim();
+  if(!name) return alert("Add class name.");
+  const id = push(ref(db,"classes")).key;
+  const data = {name,churchId:$("classChurch").value,active:true,updatedAt:Date.now()};
+  state.classes[id]=data;
+  saveLocalCache();
+  if(!DEMO_LOGIN){
+    if(navigator.onLine) await set(ref(db,`classes/${id}`), data);
+    else rememberOfflineWrite(`classes/${id}`, data);
+  }
+  $("className").value="";
+  renderAll();
+  markAutoSaved();
+};
+
+$("saveStudentBtn").onclick = async () => {
+  if(!canCreateStudent()) return alert("No permission.");
+  const name = $("studentName").value.trim();
+  if(!name){$("studentStatus").textContent="Please add student name.";return;}
+
+  $("studentStatus").textContent = "Saving to Firebase...";
+  setSyncStatus("Saving...", "saving");
+
+  const id = state.currentStudentId || push(ref(db,"students")).key;
+  const data = {
+    name,
+    churchId:isTeacher() ? state.currentProfile.churchId : $("studentChurch").value,
+    classId:isTeacher() ? state.currentProfile.classId : $("studentClass").value,
+    gender:$("studentGender").value,
+    age:$("studentAge").value.trim(),
+    parentPhone:"",
+    note:"",
+    active:true,
+    createdAt: state.students[id]?.createdAt || Date.now(),
+    updatedAt: Date.now()
+  };
+
+  try{
+    await set(ref(db,`students/${id}`), data);
+    clearStudent();
+    $("studentStatus").textContent="Student saved ✅";
+    setSyncStatus("Realtime", "offline");
+  }catch(e){
+    $("studentStatus").textContent = "Firebase save failed: " + (e.message || e.code || e);
+    setSyncStatus("Error", "error");
+    console.error("Student save error:", e);
+  }
+};
+$("clearStudentBtn").onclick = clearStudent;
+function clearStudent(){
+  state.currentStudentId=null;
+  ["studentName","studentAge"].forEach(id=>$(id).value="");
+}
+
+$("studentSearch").oninput = renderStudents;
+function renderStudents(){
+  if (!$("studentCards")) return;
+  const q = ($("studentSearch").value || "").toLowerCase();
+  const students = studentArray().filter(s=>!q || (s.name || "").toLowerCase().includes(q));
+  $("studentCards").innerHTML = students.map(s=>{
+    const st = studentStats(s.id);
+    return `<div class="student-row-compact">
+      <div class="student-row-info">
+        <div class="line1">
+          <span class="student-row-name">${s.name}</span>
+          <span class="student-row-gender">${s.gender || ""}${s.age ? " • " + s.age : ""}</span>
+        </div>
+        <div class="line2">
+          <span>${className(s.classId)}</span>
+          <span class="stars">${"⭐".repeat(st.stars) || "No star"}</span>
+        </div>
+      </div>
+      <div class="student-row-actions">
+        <button class="btn small" data-detail="${s.id}">Details</button>
+        ${canCreateStudent() ? `<button class="btn small" data-edit="${s.id}">Edit</button>` : ``}
+      </div>
+    </div>`;
+  }).join("") || `<div class="empty">No students found.</div>`;
+
+  document.querySelectorAll("[data-edit]").forEach(btn=>btn.onclick=()=>{
+    const s = state.students[btn.dataset.edit];
+    state.currentStudentId = btn.dataset.edit;
+    $("studentName").value=s.name||"";
+    $("studentChurch").value=s.churchId||"";
+    $("studentClass").value=s.classId||"";
+    $("studentGender").value=s.gender||"Male";
+    $("studentAge").value=s.age||"";
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+  document.querySelectorAll("[data-detail]").forEach(btn=>btn.onclick=()=>{
+    state.selectedStudentDetailId = btn.dataset.detail;
+    renderStudentDetail(btn.dataset.detail);
+  });
+
+  if (state.selectedStudentDetailId) renderStudentDetail(state.selectedStudentDetailId);
+}
+
+function renderStudentDetail(studentId){
+  const box = $("studentDetailBox");
+  if (!box) return;
+  const s = state.students[studentId];
+  if (!s) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  const month = ($("homeMonth")?.value || sundayDate().slice(0,7));
+  const sundays = getSundaysOfMonth(month);
+  let presentCount = 0;
+
+  const weekRows = sundays.map((date, index)=>{
+    const classRecord = state.attendance[date]?.[s.classId] || {};
+    const status = classRecord[studentId] || "absent";
+    const checked = status === "present" || status === "late";
+    if (checked) presentCount++;
+    return `<div class="student-week-row ${checked ? 'checked' : ''}">
+      <span>Week ${index + 1}</span>
+      <span>${date}</span>
+      <b>${checked ? "✅" : "—"}</b>
+    </div>`;
+  }).join("");
+
+  box.classList.remove("hidden");
+  box.innerHTML = `
+    <div class="student-detail-head">
+      <div>
+        <h3>${s.name}</h3>
+        <div class="muted">${s.gender || "-"} • Age ${s.age || "-"} • ${className(s.classId)}</div>
+      </div>
+      <button class="btn small" id="closeStudentDetailBtn">Close</button>
+    </div>
+    <div class="student-detail-stats">
+      <div><small>Monthly Count</small><b>${presentCount}</b></div>
+      <div><small>Total Sundays</small><b>${sundays.length}</b></div>
+    </div>
+    <div class="student-week-list">${weekRows || `<div class="empty">No Sundays this month.</div>`}</div>
+  `;
+
+  $("closeStudentDetailBtn").onclick = () => {
+    state.selectedStudentDetailId = null;
+    box.classList.add("hidden");
+  };
+}
+
+$("attendanceDate").onchange = renderAll;
+$("attendanceClass").onchange = renderAttendance;
+function renderAttendance(){
+  const date = $("attendanceDate").value || sundayDate();
+  const classId = $("attendanceClass").value;
+  const students = studentArray().filter(s=>s.classId===classId);
+  const saved = state.attendance[date]?.[classId] || {};
+  state.attendanceDraft = {...saved};
+  $("attendanceList").innerHTML = students.map(s=>{
+    const active = state.attendanceDraft[s.id] || "";
+    return `<div class="att-row">
+      <div><b>${s.name}</b><div class="muted">${s.parentPhone || ""}</div></div>
+      <div class="att-actions">
+        <button class="status-btn present ${active==="present"?"active":""}" data-sid="${s.id}" data-status="present">✔</button>
+        <button class="status-btn absent ${active==="absent"?"active":""}" data-sid="${s.id}" data-status="absent">✘</button>
+        <button class="status-btn late ${active==="late"?"active":""}" data-sid="${s.id}" data-status="late">⏰</button>
+      </div>
+    </div>`;
+  }).join("") || `<div class="empty">No students in this class.</div>`;
+  document.querySelectorAll(".status-btn").forEach(btn=>btn.onclick=()=>{
+    state.attendanceDraft[btn.dataset.sid]=btn.dataset.status;
+    document.querySelectorAll(`[data-sid="${btn.dataset.sid}"]`).forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+  });
+}
+$("saveAttendanceBtn").onclick = async () => {
+  const date = $("attendanceDate").value || sundayDate();
+  const classId = $("attendanceClass").value;
+  state.attendance[date] = state.attendance[date] || {};
+  state.attendance[date][classId] = {...state.attendanceDraft};
+  saveLocalCache();
+  if (!DEMO_LOGIN) {
+    if (navigator.onLine) await set(ref(db,`attendance/${date}/${classId}`), state.attendanceDraft);
+    else rememberOfflineWrite(`attendance/${date}/${classId}`, state.attendanceDraft);
+  }
+  renderAll();
+  markAutoSaved();
+  $("attendanceStatus").textContent = "Attendance saved.";
+};
+
+function renderAnalytics(){
+  const rows = studentArray().map(s=>{
+    const st = studentStats(s.id);
+    return {s,st};
+  }).sort((a,b)=>b.st.rate-a.st.rate);
+  $("analyticsBody").innerHTML = rows.map(({s,st})=>`<tr>
+    <td>${s.name}</td><td>${className(s.classId)}</td><td>${st.present}</td><td>${st.absent}</td><td>${st.rate}%</td><td class="stars">${"⭐".repeat(st.stars) || "-"}</td>
+  </tr>`).join("") || `<tr><td colspan="6">No analytics yet.</td></tr>`;
+}
+
+$("seedBtn").onclick = async () => {
+  const seed = {
+    churches:{
+      church1:{name:"Joshua Church",location:"Phnom Penh",active:true},
+      church2:{name:"Church 2",active:true}
+    },
+    pastors:{
+      pastor1:{name:"Pastor Joshua",email:"pastor@example.com",uid:"PASTOR_UID_HERE",churchId:"church1",role:"pastor",active:true}
+    },
+    teachers:{
+      teacher1:{name:"Teacher Mary",email:"teacher@example.com",uid:"TEACHER_UID_HERE",churchId:"church1",pastorId:"pastor1",classId:"class1",role:"teacher",active:true}
+    },
+    classes:{
+      class1:{name:"Kids Class",churchId:"church1",active:true},
+      class2:{name:"Teens Class",churchId:"church1",active:true}
+    },
+    students:{
+      s1:{name:"David",churchId:"church1",classId:"class1",gender:"Male",age:10,parentPhone:"",active:true},
+      s2:{name:"Mary",churchId:"church1",classId:"class1",gender:"Female",age:9,parentPhone:"",active:true},
+      s3:{name:"John",churchId:"church1",classId:"class2",gender:"Male",age:13,parentPhone:"",active:true}
+    },
+    users:{
+      [ADMIN_UID]:{name:"Thet",email:"thythet455@gmail.com",role:"admin",churchId:"all",active:true}
+    }
+  };
+  if (DEMO_LOGIN) {
+    state.churches = seed.churches;
+    state.pastors = seed.pastors;
+    state.teachers = seed.teachers;
+    state.classes = seed.classes;
+    state.students = seed.students;
+    state.activeChurchId = "church1";
+    state.attendance = {};
+    saveLocalCache();
+    renderAll();
+  } else {
+    await update(ref(db), seed);
+  }
+  alert("Demo data created.");
+};
+</script>
+</body>
+</html>
